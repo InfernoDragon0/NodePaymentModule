@@ -25,4 +25,22 @@ This is the main file that is run (like main method of java) when the server boo
 ### package.json
 This is the file that defines this node module. The description, name and version are here. In addition, the dependencies, licenses and scripts are found here.
 
-###
+### index.html
+This is the main page of the node.js server that is sent when receiving a request. We may not require this as we can use React.js to build up dynamic responses based on the request that is sent by the requester.
+
+# How do I know what file type (e.g. .js/.html) to use?
+### HTML files
+HTML files are used for showing the output or things such as a form
+
+### JS files
+JS files are used to define the code that will be run by node.js
+
+Also can be used as animation functions for HTML, etc
+
+You will need to output HTML code OR HTML files as the response when dealing with requests.
+
+### CSS files
+You may use css files to style the html files via linking
+
+### JSON files
+JSON files are for storage of properties
