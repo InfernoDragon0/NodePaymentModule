@@ -1,17 +1,13 @@
-var braintree = require('braintree');
+var braintree = require('braintree'); //braintree payment gateway
 var ejs = require('ejs'); //ejs is not express, but is a extension to express
-var path = require("path");
-var amount1 = "0";
+var path = require("path"); //pathing system
+//var amount1 = "0"; //not yet
 
-const express = require('express');
+const express = require('express'); //express is good
 const app  = express();
-const http = require('http');
-const fs = require('fs');
-
+//const http = require('http'); //http stuff, not needed yet
+//const fs = require('fs'); //filesystem, not needed yet
 const port = 3000;
-
-var resp;
-var clientoken;
 
 var gateway = braintree.connect({
   environment: braintree.Environment.Sandbox,
@@ -33,11 +29,18 @@ app.use(express.static('css'));
 app.use(express.static('img'));
 
 /**
- * on start at localhost:3000/ generate the token
+ * on start at localhost:3000/pay/10.00 generate the token
+ * we need to make this method into POST to prevent editting amount
  */
-app.get('/', function(req, res) {
-    resp = res;
-    generatetoken();
+app.get('/pay/:amount', function(req, res) {
+    gateway.clientToken.generate({}, function (err, response) {
+      console.log(response.clientToken);
+      res.render(path.join(__dirname + '/index.html'),
+    {
+      clientoken : response.clientToken,
+      amount: req.params['amount']
+    });
+  });
 });
 
 /**
@@ -49,21 +52,12 @@ app.listen(port);
  * handles 404 errors here
  */
 app.use(function (req, res, next) {
-  res.status(404).send("This directory does not exist!")
+  res.status(404).send("You may not view this page.")
 })
 
 /**
  * Generates our client token together with sending the main page
  */
-function generatetoken() { 
-  gateway.clientToken.generate({}, function (err, response) {
-      console.log(response.clientToken);
-      resp.render(path.join(__dirname + '/index.html'),
-    {
-      clientoken : response.clientToken
-    });
-  });
-}
 
 /**
  * not used yet, moving these to nodemodjs to be separate JS files, easier to maintain
@@ -77,7 +71,7 @@ function getnonce() {
 }
 function chargecard (nonceFromTheClient){
 gateway.transaction.sale({
-  amount: amount1,
+  amount: "10.00",
   paymentMethodNonce: nonceFromTheClient,
   options: {
     submitForSettlement: true
