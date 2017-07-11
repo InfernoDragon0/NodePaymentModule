@@ -24,31 +24,9 @@ app.engine('html', require('ejs').renderFile);
 /**
  * evals js/css/img folders for JS/CSS/image files
  */
-app.use(express.static('js'));
-app.use(express.static('css'));
-app.use(express.static('img'));
-
-/**
- * on start at localhost:3000/pay/10.00 generate the token
- * we need to make this method into POST to prevent editting amount
- * 
- * API Description:
- * This is the credit card request function
- * 
- * amount: the amount to pay, 1 = $1.00
- * To use: send a request to localhost:3000/pay/(amount)
- * Example Request: /pay/300.00
- */
-app.get('/pay/:amount', function(req, res) {
-    gateway.clientToken.generate({}, function (err, response) {
-      console.log(response.clientToken);
-      res.render(path.join(__dirname + '/index.html'),
-    {
-      clientoken : response.clientToken,
-      amount: req.params['amount']
-    });
-  });
-});
+app.use(express.static(path.join(__dirname, 'js')));
+app.use(express.static(path.join(__dirname, 'css')));
+app.use(express.static(path.join(__dirname, 'img')));
 
 /**
  * listens to @port 3000
@@ -56,15 +34,35 @@ app.get('/pay/:amount', function(req, res) {
 app.listen(port);
 
 /**
- * handles 404 errors here
+ * on start at localhost:3000/pay/10.00 generate the token
+ * we need to make this method into POST to prevent editting amount
+ * 
+ * API Description: 
+ * This is the credit card request function
+ * 
+ * amount: the amount to pay, 1 = $1.00
+ * To use: send a request to localhost:3000/pay/(amount)
+ * Example Request: /pay/300.00
  */
-app.use(function (req, res, next) {
-  res.status(404).send("You may not view this page. Please use localhost:3000/pay/(someamount) e.g. localhost:3000/pay/50.00")
-})
+app.get('/pay', function(req, res) {
+    gateway.clientToken.generate({}, function (err, response) {
+      console.log(response.clientToken);
+      res.render(path.join(__dirname + '/index.html'),
+    {
+      clientoken : response.clientToken
+      //amount: req.params['amount']
+    });
+  });
+});
 
 /**
- * Generates our client token together with sending the main page
+ * handles 404 errors here
+ * 
+ * note that this has to be the last app.x function
  */
+app.use(function (req, res, next) {
+  res.status(404).send("You may not view this page. Please use localhost:3000/pay")
+})
 
 /**
  * not used yet, moving these to nodemodjs to be separate JS files, easier to maintain
