@@ -33,6 +33,7 @@ app.get('/', function(req, res) {
     generatetoken();
 });
 
+
 /**
  * listens to @port 3000
  */
@@ -56,7 +57,7 @@ function generatetoken() {
       console.log(response.clientToken);
       resp.render(path.join(__dirname + '/index.html'),
     {
-      clientoken : "tokendata is " + response.clientToken
+      clientoken : response.clientToken
     });
   });
 }
