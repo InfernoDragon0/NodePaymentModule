@@ -5,6 +5,28 @@
 <link rel="stylesheet" href="styles.css">
 <title>BrainTree, Index</title>
 <body style= "background-color: #f2f2f2;">
+<script src="https://js.braintreegateway.com/web/dropin/1.3.1/js/dropin.min.js"></script>
+<div id="dropin-container"></div>
+  <button id="submit-button">Request payment method</button>
+<script src="main.js"></script>
+  <script>
+    var button = document.querySelector('#submit-button');
+    generatetoken();
+    
+    var clientoken1 = clientoken
+
+    braintree.dropin.create({
+      authorization: clientoken,
+      container: '#dropin-container'
+    }, function (createErr, instance) {
+      button.addEventListener('click', function () {
+        instance.requestPaymentMethod(function (err, payload) {
+          // Submit payload.nonce to your server
+        });
+      });
+    });
+  </script>
+
 
 <div id = "header">
 <h1><a href="index.html">BRAINTREE<br>a PayPal service<br></a></h1>
@@ -53,7 +75,7 @@ class="button" style="font-size:16px;" />
 
 <input type="submit" name="submit" value="SUBMIT" onclick="generatetoken()" 
 class="button" style="font-size:16px;"/>
-<script src="main.js"></script>
+
 
 
 <br>

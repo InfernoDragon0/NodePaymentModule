@@ -1,4 +1,5 @@
 var braintree = require('braintree');
+var ejs = require('ejs');
 var amount1 = "0";
 
 const http = require('http');
@@ -7,25 +8,36 @@ const hostname = '127.0.0.1';
 const port = 3000;
 
 var resp;
+var clientoken;
 // start local host
-fs.readFile('testIndex.html',  (err,html) => {
-	if(err){
-		throw err;
-	}
-	const server = http.createServer((req,res) => {
-        resp = res;
-	 	res.statusCode = 200;
-	 	res.setHeader('Content-type','text/html');
-	 	var token = generatetoken();
-         res.write(html);
-         console.log(token);
-	 	res.end();
-	});
 
-	server.listen(port, hostname, () => {
-		console.log('Server started on port ' +port);
-	});
-});
+
+
+http.createServer(function(req,res) {
+    console.log("Server running on Port" +port )
+  res.writeHead(200, {'Content-Type': 'text/html'});
+  //since we are in a request handler function
+  //we're using readFile instead of readFileSync
+  fs.readFile('testIndex.html', 'utf-8', function(err, content) {
+    if (err) {
+      res.end('error occurred');
+      return;
+    }
+    generatetoken();  //here you assign temp variable with needed value
+
+    var renderedHtml = ejs.render(content, {clientoken: clientoken});  //get redered HTML code
+    res.end(renderedHtml);
+  });
+}).listen(3000);
+
+
+
+
+
+
+
+
+
 
 
 var gateway = braintree.connect({
@@ -37,7 +49,8 @@ var gateway = braintree.connect({
 function generatetoken (){
    
   gateway.clientToken.generate({}, function (err, response) {
-    console.log(response.clientToken);
+      clientoken = response.clientToken;
+    console.log(clientoken);
 
 });
 }
@@ -63,3 +76,35 @@ gateway.transaction.sale({
     }
 });
 }
+
+function createcustomer(){
+    var firstName1
+    var lastName1
+    var phone1
+
+    gateway.customer.create({
+  firstName: firstName1,
+  lastName: lastName1,
+  phone: phone1
+}, function (err, result) {
+  result.success;
+  // true
+
+  result.customer.id;
+  // e.g. 494019
+});
+}
+
+function findcustomer (){
+    var theCustomerId
+    gateway.customer.find(theCustomerId, function(err, customer) {
+        if(err==0){
+            chargecard(customer);
+        }
+        else {
+            console.log(err)
+        };
+});
+}
+
+
