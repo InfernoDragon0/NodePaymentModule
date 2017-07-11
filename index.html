@@ -1,8 +1,37 @@
 <html>
-
+    <script> var clienttoken = '<%= clientoken %>' </script>
+    <p>Your Generated Token: <script>document.write(clienttoken)</script> </p>
     <p>
     Credit Card: <input name= "cc" type="textbox"> </p>
     <p> CVC: <input name="cvc" type="textbox"> </p>
     <p> Expiry:  <input name="expiry" type="textbox"> </p>
     <button name="submit">Submit</button>
+<head>
+  <meta charset="utf-8">
+  <script src="https://js.braintreegateway.com/web/dropin/1.3.1/js/dropin.min.js"></script>
+</head>
+<body>
+  <div id="dropin-container"></div>
+  <button id="submit-button">Request payment method</button>
+  <script>
+    var button = document.querySelector('#submit-button');
+
+    braintree.dropin.create({
+      authorization: '<%= clientoken %>',
+      container: '#dropin-container'
+    }, function (createErr, instance) {
+      button.addEventListener('click', function () {
+          if (createErr) {
+         // Handle any errors that might've occurred when creating Drop-in 
+         console.error(createErr);
+         return;
+       }
+        instance.requestPaymentMethod(function (err, payload) {
+          // Submit payload.nonce to your server
+        });
+      });
+    });
+  </script>
+</body>
+
     </html>

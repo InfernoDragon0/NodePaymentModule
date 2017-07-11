@@ -1,45 +1,17 @@
 var braintree = require('braintree');
-var ejs = require('ejs');
+var ejs = require('ejs'); //ejs is not express, but is a extension to express
+var path = require("path");
 var amount1 = "0";
 
+const express = require('express');
+const app  = express();
 const http = require('http');
 const fs = require('fs');
-const hostname = '127.0.0.1';
+
 const port = 3000;
 
 var resp;
 var clientoken;
-// start local host
-
-
-
-http.createServer(function(req,res) {
-    console.log("Server running on Port" +port )
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  //since we are in a request handler function
-  //we're using readFile instead of readFileSync
-  fs.readFile('testIndex.html', 'utf-8', function(err, content) {
-    if (err) {
-      res.end('error occurred');
-      return;
-    }
-    generatetoken();  //here you assign temp variable with needed value
-
-    content = content +"fkyou";
-    var renderedHtml = ejs.render(content, {clientoken: clientoken});  //get redered HTML code
-    res.end(renderedHtml);
-  });
-}).listen(3000);
-
-
-
-
-
-
-
-
-
-
 
 var gateway = braintree.connect({
   environment: braintree.Environment.Sandbox,
@@ -47,14 +19,48 @@ var gateway = braintree.connect({
   publicKey: "ymkd4bvhhwrg48fz",
   privateKey: "0c913707bb92caa67f77b31dca2fcf4a"
 });
-function generatetoken (){
+
+/**
+ * uses ejs engine to eval HTML files (to use <%= %> variables)
+ */
+app.engine('html', require('ejs').renderFile);
+
+/**
+ * on start at localhost:3000/ generate the token
+ */
+app.get('/', function(req, res) {
+    resp = res;
+    generatetoken();
+});
+
+/**
+ * listens to @port 3000
+ */
+
+app.listen(port);
+
+/**
+ * handles 404 errors here
+ */
+
+app.use(function (req, res, next) {
+  res.status(404).send("This directory does not exist!")
+})
+
+/**
+ * Generates our client token together with sending the main page
+ */
+function generatetoken() {
    
   gateway.clientToken.generate({}, function (err, response) {
-      clientoken = response.clientToken;
-    console.log(clientoken);
-
-});
+      console.log(response.clientToken);
+      resp.render(path.join(__dirname + '/index.html'),
+    {
+      clientoken : "tokendata is " + response.clientToken
+    });
+  });
 }
+
 function getnonce(){
     app.post("/checkout", function (req, res) {
   var nonceFromTheClient = req.body.payment_method_nonce;
