@@ -22,8 +22,13 @@
          return;
         }
         instance.requestPaymentMethod(function (err, payload) {
-          // Submit payload.nonce to your server
-          console.log("payload is " + payload.nonce);
+            if (err) {
+                alert("There is an error processing the card: " + err);
+                console.error(err);
+            }
+            // Submit payload.nonce to your server
+            console.log("payload is " + payload.nonce);
+            alert("nonce is " + payload.nonce + "\n Use nonce for payment stuffs");
         });
       });
     });
