@@ -26,13 +26,19 @@ var gateway = braintree.connect({
 app.engine('html', require('ejs').renderFile);
 
 /**
+ * evals js/css/img folders for JS/CSS/image files
+ */
+app.use(express.static('js'));
+app.use(express.static('css'));
+app.use(express.static('img'));
+
+/**
  * on start at localhost:3000/ generate the token
  */
 app.get('/', function(req, res) {
     resp = res;
     generatetoken();
 });
-
 
 /**
  * listens to @port 3000
@@ -62,7 +68,11 @@ function generatetoken() {
   });
 }
 
-function getnonce(){
+
+/**
+ * not used yet
+ */
+function getnonce() {
     app.post("/checkout", function (req, res) {
   var nonceFromTheClient = req.body.payment_method_nonce;
   // Use payment method nonce here
