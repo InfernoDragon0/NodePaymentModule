@@ -23,7 +23,12 @@ Please enter the following information.
 <br>
 
 <div id = "accform">
-<form action="rResults.php" method="post">
+
+<p>
+<b> Cost: $ </b><br>
+<input type = "text" name = "cost" value = "40" style="width:300px; height:30px">
+</p>
+<br>
 
 <p>
 <b>Credit Card:</b><br>
@@ -46,9 +51,9 @@ Please enter the following information.
 <input type="reset" value="RESET" 
 class="button" style="font-size:16px;" />
 
-<input type="submit" name="submit" value="REGISTER" 
+<input type="submit" name="submit" value="SUBMIT" onclick="generatetoken()" 
 class="button" style="font-size:16px;"/>
-
+<script src="main.js"></script>
 
 
 <br>
