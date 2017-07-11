@@ -1,0 +1,275 @@
+*{
+	margin:0;
+	padding:0;
+	list-style:none;
+	text-decoration:none;
+}
+#start{text-align:center;
+		padding-top: 100px;
+	
+}
+#leggo{float:right;
+		padding-right:120px;
+		background-color:black;
+	   	font-family: Forte;
+		font-size: 30px  
+		
+}
+
+#footer {
+    background-color:transparent;
+    color:black;
+    clear:both;
+    text-align:left;
+   	padding-top:80px;
+   	font-family: Arial;
+    font-size: 15px  		 	 
+}
+#header
+		{background-color: none;
+		padding-top: 20px;
+		padding-bottom: 10px;
+		padding-left: 80px;
+} 
+
+h1 a{color: #33cccc	;
+	font-family: Forte;
+	font-size: 100%;
+}
+#pic {padding-right: 430px;
+		text-align:center;
+}
+#sqPic {border: 1px;
+		border-style:solid;
+		border-color: #f2f2f2;
+		text-align:left;
+		padding-left:60px;
+
+}
+
+#lbl{color: #8c8c8c;
+	font-family: Courier New;
+	font-size: 40px;
+	padding-left: 80px;
+	
+}
+
+#accinfo{color: red;
+		font-family: Lucida Calligraphy;
+		font-size: 15px;
+		padding-left: 100px;
+}
+#accform{color: #8c8c8c;
+		font-family: Courier New;
+		font-size: 30px;
+		padding-left: 180px;
+		padding-right: 120px;
+}
+.shopInfo{font-family: Comic New;
+		font-size: 40px;
+		text-align:left;
+		padding-left:60px;
+}
+.itemInfo{font-family: Comic New;
+		font-size: 25px;
+		text-align:left;
+		padding-right:80px;
+}
+
+input[type="text"]
+{
+    font-size:20px;
+	font-family:Arial;
+}
+input[type="date"]
+{
+    font-size:20px;
+	font-family:Arial;
+}
+
+
+ul {list-style-type: none;
+    margin: 0;
+    padding-right: 150px;
+    overflow: hidden;
+    background-color: #f2f2f2;
+	font-family: Forte;
+	font-size: 20px;
+	
+}
+
+li {float: right;
+}
+
+li a {display: block;
+    color: #33cccc	;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+
+
+li a:hover {text-decoration: underline;
+}
+.fpass {float: left;
+}
+
+
+
+/* w3-content */
+.test {max-width:720px; 
+		margin:auto;
+		text-align:center;
+		}
+
+/*w3-section */
+.test2 {margin-top:16px;
+		margin-bottom:16px;
+		text-align:center;
+		}
+
+/* Fading animation */
+.fade {
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 2.5s;
+  animation-name: fade;
+  animation-duration: 2.5s;
+}
+
+@-webkit-keyframes fade {
+  from {opacity: .08} 
+  to {opacity: 1}
+}
+
+@keyframes fade {
+  from {opacity: .08} 
+  to {opacity: 1}
+}
+/* ////////////////////////////////////////////////////////// */
+.button {
+  border-radius: 4px;
+  background-color: #33cccc;
+  border: none;
+  color: white;
+  text-align: center;
+  font-size: 28px;
+  padding: 10px;
+  width: 150px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '»';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+/* ////////////////////////////////////////////////////////// */
+
+.itemName{font-family: Comic New;
+		font-size: 40px;
+		text-align:left;
+		padding-left:60px;}
+.itemDesc{font-family: Comic New;
+		font-size: 25px;
+		text-align:left;
+		padding-right:80px;}
+.itemHead{color: #8c8c8c;
+	font-family: Lucida Calligraphy;
+	font-size: 40px;
+	padding-left: 80px;}
+/* ////////////////////////////////////////////////////////// */
+.backButton{float: right;
+			padding-right:80px;}
+.shopButton{float:center;}
+			
+.displayLogin{text-align:left;
+				font-family: Forte;
+				font-size: 30px;
+				padding-top:80px;
+				padding-bottom:80px;
+				padding-left:100px;}
+.spacing{text-align:center;
+			padding-right:500px;
+	
+}
+.contactInfo{text-align:left;
+				font-family: Lucida Calligraphy;
+				font-size: 20px;
+				padding-top:20px;
+				padding-bottom:20px;
+				padding-left:20px;
+				padding-right:20px;}
+				
+				
+legend{display: block;
+		padding-left: 40px;
+		padding-right: 40px;
+		border: none;
+}
+.legendInfo{text-align:center;
+				font-family: Forte;
+				font-size: 20px;
+				padding-top:30px;
+				padding-bottom:30px;
+				padding-left:80px;
+				padding-right:600px;}
+				
+.map{padding-right:80px;
+		float:right;
+		margin-top:-260px;}
+		
+
+
+.shophead ul {list-style-type: none;
+				margin: 0;
+				padding-left:  200px;
+				overflow: hidden;
+				background-color: #f2f2f2;
+				font-family: Forte;
+				font-size: 30px;
+				text-align:center;
+	
+}
+
+.shophead li {float: left;
+}
+
+.shophead li a {display: block;
+    color: #33cccc	;
+    text-align: center;
+    padding: 14px 60px;
+    text-decoration: none;
+}
+
+
+
+.shophead li a:hover {text-decoration: underline;
+}
+
+.time{float: right;
+		padding-right:80px;
+		margin-top:-80px;}
+
+
