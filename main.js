@@ -31,6 +31,13 @@ app.use(express.static('img'));
 /**
  * on start at localhost:3000/pay/10.00 generate the token
  * we need to make this method into POST to prevent editting amount
+ * 
+ * API Description:
+ * This is the credit card request function
+ * 
+ * amount: the amount to pay, 1 = $1.00
+ * To use: send a request to localhost:3000/pay/(amount)
+ * Example Request: /pay/300.00
  */
 app.get('/pay/:amount', function(req, res) {
     gateway.clientToken.generate({}, function (err, response) {
