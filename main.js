@@ -1,6 +1,28 @@
 var braintree = require('braintree');
 var amount1 = "0";
 
+const http = require('http');
+const fs = require('fs');
+const hostname = '127.0.0.1';
+const port = 3000;
+// start local host
+fs.readFile('testIndex.html',  (err,html) => {
+	if(err){
+		throw err;
+	}
+	const server = http.createServer((req,res) => {
+	 	res.statusCode = 200;
+	 	res.setHeader('Content-type','text/html');
+	 	res.write(html);
+	 	res.end();
+	});
+
+	server.listen(port, hostname, () => {
+		console.log('Server started on port ' +port);
+	});
+});
+
+
 var gateway = braintree.connect({
   environment: braintree.Environment.Sandbox,
   merchantId: "hczwym8pfvhkb6gm",
