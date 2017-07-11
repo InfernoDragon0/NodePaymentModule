@@ -52,7 +52,7 @@ app.listen(port);
  * handles 404 errors here
  */
 app.use(function (req, res, next) {
-  res.status(404).send("You may not view this page.")
+  res.status(404).send("You may not view this page. Please use localhost:3000/pay/(someamount) e.g. localhost:3000/pay/50.00")
 })
 
 /**
