@@ -25,6 +25,7 @@ http.createServer(function(req,res) {
     }
     generatetoken();  //here you assign temp variable with needed value
 
+    content = content +"fkyou";
     var renderedHtml = ejs.render(content, {clientoken: clientoken});  //get redered HTML code
     res.end(renderedHtml);
   });
