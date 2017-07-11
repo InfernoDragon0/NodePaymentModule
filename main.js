@@ -24,9 +24,9 @@ app.engine('html', require('ejs').renderFile);
 /**
  * evals js/css/img folders for JS/CSS/image files
  */
-app.use(express.static(path.join(__dirname, 'js')));
-app.use(express.static(path.join(__dirname, 'css')));
-app.use(express.static(path.join(__dirname, 'img')));
+app.use(express.static(path.join(__dirname, '/js')));
+app.use(express.static(path.join(__dirname, '/css')));
+app.use(express.static(path.join(__dirname, '/img')));
 
 /**
  * listens to @port 3000
@@ -45,12 +45,18 @@ app.listen(port);
  * Example Request: /pay/300.00
  */
 app.get('/pay', function(req, res) {
+  if(!req.query.amount || req.query.amount < 0.01) {
+        res.send("<p>Please use localhost:3000/pay?amount=0.01 or more</p>");
+        return;
+      }
+
     gateway.clientToken.generate({}, function (err, response) {
-      console.log(response.clientToken);
+      console.log(response.clientToken);      
+
       res.render(path.join(__dirname + '/index.html'),
     {
-      clientoken : response.clientToken
-      //amount: req.params['amount']
+      clientoken : response.clientToken,
+      amount: req.query.amount
     });
   });
 });
