@@ -43,13 +43,11 @@ app.get('/', function(req, res) {
 /**
  * listens to @port 3000
  */
-
 app.listen(port);
 
 /**
  * handles 404 errors here
  */
-
 app.use(function (req, res, next) {
   res.status(404).send("This directory does not exist!")
 })
@@ -57,8 +55,7 @@ app.use(function (req, res, next) {
 /**
  * Generates our client token together with sending the main page
  */
-function generatetoken() {
-   
+function generatetoken() { 
   gateway.clientToken.generate({}, function (err, response) {
       console.log(response.clientToken);
       resp.render(path.join(__dirname + '/index.html'),
@@ -68,9 +65,8 @@ function generatetoken() {
   });
 }
 
-
 /**
- * not used yet
+ * not used yet, moving these to nodemodjs to be separate JS files, easier to maintain
  */
 function getnonce() {
     app.post("/checkout", function (req, res) {
@@ -94,7 +90,6 @@ gateway.transaction.sale({
     }
 });
 }
-
 function createcustomer(){
     var firstName1
     var lastName1
@@ -112,7 +107,6 @@ function createcustomer(){
   // e.g. 494019
 });
 }
-
 function findcustomer (){
     var theCustomerId
     gateway.customer.find(theCustomerId, function(err, customer) {
@@ -124,5 +118,3 @@ function findcustomer (){
         };
 });
 }
-
-
