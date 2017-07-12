@@ -1,3 +1,7 @@
+/**
+ * Common variables file to reduce copy pasting
+ */
+
 var braintree = require('braintree'); //braintree payment gateway
 
 var gateway = braintree.connect({
