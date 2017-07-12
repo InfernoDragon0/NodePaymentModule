@@ -1,5 +1,6 @@
 var button = document.querySelector('#submit-button');
-    
+var http = new XMLHttpRequest();
+
 braintree.dropin.create({
     authorization: clienttoken,
     container: '#dropin-container'
@@ -19,6 +20,21 @@ braintree.dropin.create({
             // Submit payload.nonce to your server
             console.log("payload is " + payload.nonce);
             alert("nonce is " + payload.nonce + "\n Use nonce for payment stuffs");
+            sendPost("/processpayment", "amount=" + amount + "&nonce=" + payload.nonce);
         });
     });
 });
+
+function sendPost(url, params) {
+http.open("POST", url, true);
+
+//Send the proper header information along with the request
+http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+http.onreadystatechange = function() {//Call a function when the state changes.
+    if(http.readyState == 4 && http.status == 200) {
+        document.write(http.responseText);
+    }
+}
+http.send(params);
+}
