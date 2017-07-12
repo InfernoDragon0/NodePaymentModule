@@ -1,3 +1,10 @@
+//please use main.js only for app.x so that it is cleaner
+/**
+ * Split the modules into parts, for node sided JS please put in 
+ * nodemodjs and use module.exports to #include functions here
+ * 
+ * For client sided JS please put in js folder
+ */
 
 var ejs = require('ejs'); //ejs is not express, but is a extension to express
 var path = require("path"); //pathing system
@@ -33,7 +40,7 @@ app.listen(port);
 
 /**
  * on start at localhost:3000/pay?amount=10.00 generate the token
- * TODO: we need to make this method into POST to prevent editting amount
+ * Requires Bot to send the query via POST
  * 
  * API Description: 
  * This is the credit card request function
@@ -61,24 +68,25 @@ app.get('/pay', function(req, res) {
 });
 
 /**
- * API Description: 
- * This is process payment method for single card charges
- * 
- * amount: the amount to pay, 1 = $1.00
- * nonce: the card token to be charged
- * To use: send a request to localhost:3000/processpayment via POST
- * Example Request: /processpayment + POSTDATA{ amount: 50.00, nonce: "x" }
+ * processpayment handler, customer.chargeCard for details
  */
 app.post('/processpayment', function(req, res) {
-  console.log("amount is " + req.body.amount);  
-  console.log("nonce is " + req.body.nonce);
-  
-  
   if(!req.body.amount || !req.body.nonce) {
       res.send("<p>Please provide amount and nonce</p>");
       return;
   }
   customer.chargeCard(req.body.amount,req.body.nonce,res);
+});
+
+/**
+ * create customer handler, customer.createCustomer for details
+ */
+app.get("/create/customer", function(req, res) {
+  if(!req.query.clientid) {
+      res.send("<p>Please provide clientid</p>");
+      return;
+  }
+  customer.createCustomer(req.query.clientid,res);
 });
 
 /**
@@ -88,8 +96,4 @@ app.post('/processpayment', function(req, res) {
  */
 app.use(function (req, res, next) {
   res.status(404).send("You may not view this page. Please use localhost:3000/pay")
-})
-
-/**
- * not used yet, moving these to nodemodjs to be separate JS files, easier to maintain
- */
+});
