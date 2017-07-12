@@ -60,6 +60,15 @@ app.get('/pay', function(req, res) {
   });
 });
 
+/**
+ * API Description: 
+ * This is process payment method for single card charges
+ * 
+ * amount: the amount to pay, 1 = $1.00
+ * nonce: the card token to be charged
+ * To use: send a request to localhost:3000/processpayment via POST
+ * Example Request: /processpayment + POSTDATA{ amount: 50.00, nonce: "x" }
+ */
 app.post('/processpayment', function(req, res) {
   console.log("amount is " + req.body.amount);  
   console.log("nonce is " + req.body.nonce);
@@ -84,31 +93,3 @@ app.use(function (req, res, next) {
 /**
  * not used yet, moving these to nodemodjs to be separate JS files, easier to maintain
  */
-function createcustomer(){
-    var firstName1
-    var lastName1
-    var phone1
-
-    gateway.customer.create({
-  firstName: firstName1,
-  lastName: lastName1,
-  phone: phone1
-}, function (err, result) {
-  result.success;
-  // true
-
-  result.customer.id;
-  // e.g. 494019
-});
-}
-function findcustomer (){
-    var theCustomerId
-    gateway.customer.find(theCustomerId, function(err, customer) {
-        if(err==0){
-            chargecard(customer);
-        }
-        else {
-            console.log(err)
-        };
-});
-}
