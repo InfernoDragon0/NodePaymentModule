@@ -4,12 +4,13 @@
  * nodemodjs and use module.exports to #include functions here
  * 
  * For client sided JS please put in js folder
+ * 
+ * Remember, this is an API so calls should not rely too much on html
  */
 
 var ejs = require('ejs'); //ejs is not express, but is a extension to express
 var path = require("path"); //pathing system
 var bodyParser = require('body-parser'); //parse POST data
-//var amount1 = "0"; //not yet
 const cvars = require("./nodemodjs/commonvariables.js");
 
 const express = require('express'); //express is good

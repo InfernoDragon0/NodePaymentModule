@@ -46,7 +46,6 @@ function chargeCard (amount,nonce, res) {
     });
 }
 
-
 /**
  * API Description:
  * Creates a customer token for the clientID that is given and stores it in the database
