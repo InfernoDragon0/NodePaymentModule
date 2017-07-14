@@ -1,7 +1,7 @@
 <html>
+  <link rel="stylesheet" href="materialize.css">
     <script> var clienttoken = '<%= clientoken %>';
-    var amount = '<%= amount %>';
-    
+    var amount = '<%= amount %>';    
      </script>
     <p>Your Generated Token: <script>document.write(clienttoken)</script> </p>
     <p>Payable Amount: <script>document.write(amount)</script></p>
@@ -11,7 +11,7 @@
 </head>
 <body>
   <div id="dropin-container"></div>
-  <button id="submit-button">Request Payment</button>
+  <button id="submit-button" class="waves-effect waves-light btn" style="width:100%;height:50px;">Confirm Payment</button>
   <script src="client.js"></script>
 </body>
 </html>
