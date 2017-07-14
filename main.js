@@ -63,7 +63,7 @@ app.get('/pay', function(req, res) { //change to app.post once debug finish
       }
     var sess = req.session;
     
-    cvars.gateway.clientToken.generate({}, function (err, response) {
+    cvars.gateway.clientToken.generate({customerId: req.query.customer}, function (err, response) {
       console.log(response.clientToken);      
       sess.customer = req.query.customer;
        console.log("customer is " + sess.customer);

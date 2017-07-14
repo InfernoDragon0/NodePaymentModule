@@ -1,6 +1,5 @@
 var button = document.querySelector('#submit-button');
 var http = new XMLHttpRequest();
-
 braintree.dropin.create({
     authorization: clienttoken,
     container: '#dropin-container'
