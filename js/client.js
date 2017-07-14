@@ -19,7 +19,6 @@ braintree.dropin.create({
             }
             // Submit payload.nonce to your server
             console.log("payload is " + payload.nonce);
-            alert("nonce is " + payload.nonce + "\n Use nonce for payment stuffs");
             sendPost("/processpayment", "amount=" + amount + "&nonce=" + payload.nonce);
         });
     });
