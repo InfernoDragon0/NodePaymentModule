@@ -1,6 +1,5 @@
 var button = document.querySelector('#submit-button');
 var http = new XMLHttpRequest();
-
 braintree.dropin.create({
     authorization: clienttoken,
     container: '#dropin-container'
@@ -19,7 +18,6 @@ braintree.dropin.create({
             }
             // Submit payload.nonce to your server
             console.log("payload is " + payload.nonce);
-            alert("nonce is " + payload.nonce + "\n Use nonce for payment stuffs");
             sendPost("/processpayment", "amount=" + amount + "&nonce=" + payload.nonce);
         });
     });

@@ -11,6 +11,7 @@
 var ejs = require('ejs'); //ejs is not express, but is a extension to express
 var path = require("path"); //pathing system
 var bodyParser = require('body-parser'); //parse POST data
+var session = require('express-session'); //temporary to store sensitive data, see if theres better way
 const cvars = require("./nodemodjs/commonvariables.js");
 
 const express = require('express'); //express is good
@@ -24,9 +25,13 @@ const port = 3000;
  * uses ejs engine to eval HTML files (to use <%= %> variables)
  */
 app.engine('html', require('ejs').renderFile);
+app.use(session({
+  secret: 'whatsecretshallweuse kitten',//session secret to sign sessions
+  resave: true, //force save
+  saveUninitialized: true,
+  /*cookie: { secure: true }*/})); //secure needs HTTPS, cookies will not be stored if running from HTTP with this option
 app.use(bodyParser.json()); // supporting POST data
 app.use(bodyParser.urlencoded({ extended: true })); // supportting POST data
-
 /**
  * evals js/css/img folders for JS/CSS/image files
  */
@@ -51,15 +56,17 @@ app.listen(port);
  * To use: send a request to localhost:3000/pay?amount=(amount)&customer=(token)
  * Example Request: /pay?amount=300.00
  */
-app.get('/pay', function(req, res) {
-  if(!req.query.amount || req.query.amount < 0.01) {
-        res.send("<p>Please use localhost:3000/pay?amount=0.01 or more</p>");
+app.get('/pay', function(req, res) { //change to app.post once debug finish
+  if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer) { //change to req.body if POST
+        res.send("<p>Please use localhost:3000/pay?amount=0.01&customer=someid or more</p>");
         return;
       }
-
-    cvars.gateway.clientToken.generate({}, function (err, response) {
+    var sess = req.session;
+    
+    cvars.gateway.clientToken.generate({customerId: req.query.customer}, function (err, response) {
       console.log(response.clientToken);      
-
+      sess.customer = req.query.customer;
+       console.log("customer is " + sess.customer);
       res.render(path.join(__dirname + '/index.html'),
     {
       clientoken : response.clientToken,
@@ -72,11 +79,11 @@ app.get('/pay', function(req, res) {
  * processpayment handler, customer.chargeCard for details
  */
 app.post('/processpayment', function(req, res) {
-  if(!req.body.amount || !req.body.nonce) {
-      res.send("<p>Please provide amount and nonce</p>");
+  if(!req.body.amount || !req.body.nonce || !req.session.customer) {
+      res.send("<p>Please provide amount, nonce and customer token</p>");
       return;
   }
-  customer.chargeCard(req.body.amount,req.body.nonce,res);
+  customer.chargeCard(req.body.amount,req.body.nonce,req.session.customer,res);
 });
 
 /**

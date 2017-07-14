@@ -14,17 +14,19 @@ module.exports.createCustomer = createCustomer;
  * amount: the amount to pay, 1 = $1.00
  * nonce: the card token to be charged
  * To use: send a request to localhost:3000/processpayment via POST
- * Example Request: /processpayment + POSTDATA{ amount: 50.00, nonce: "x" }
+ * Example Request: /processpayment + POSTDATA{ amount: 50.00, nonce: "x", customertoken: "12345678" }
  * 
  * @param {*double} amount 
  * @param {*string} nonce 
  * @param {*var} res 
  */
-function chargeCard (amount,nonce, res) {
+function chargeCard (amount,nonce,customertoken,res) {
     cvars.gateway.transaction.sale({
         amount: amount,
         paymentMethodNonce: nonce,
+        customerId: customertoken,
         options: {
+            storeInVaultOnSuccess: true, //store the card with this customer on successful payment
             submitForSettlement: true //must submit for settlement to process payment, can set to false to settle later
         }
     }, function (err, result) { //we can send the whole RESULT so that the bot can manually use the json data
