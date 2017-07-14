@@ -1,12 +1,26 @@
+
+// insert function with existing data check
 var mongo = require('mongodb');
 
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://test:test@ds147842.mlab.com:47842/jedbprototype";
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://test:test@ds147842.mlab.com:47842/jedbprototype";
 
-    // search client id var ( to be changed in final product)
-    var seachclient_id = "10";
+var newclient_id = "3";
+var newclientToken = "token 4";
 
-    // running find function
+MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    var newClientDetails = { client_id: newclient_id, client_token_braintree: newclientToken };
+    db.collection("clientDetails").insertOne(newClientDetails, function (err, res) {
+        if (err) throw err;
+        console.log("1 new client added| Client ID =" + newclient_id);
+        db.close();
+    });
+});
+
+
+var seachclient_id = "0";
+
     MongoClient.connect(url, function(err, db) {
       if (err) throw err;
       db.collection("clientDetails").findOne({client_id:seachclient_id}, function(err, result) {
@@ -24,4 +38,3 @@ var mongo = require('mongodb');
         db.close();
       });
     });
-

@@ -1,5 +1,5 @@
 var mongo = require('mongodb');
-
+var mysql = require('mysql');
 
 
 //const http = require('http');
@@ -26,43 +26,40 @@ var mongo = require('mongodb');
 
 
 // insert new client data into mongoDB
-function insertDB(){
+//function insertDB(){
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb://127.0.0.1:27017/jungleElementsDB";
+
     // new client id with new token to be here
-    var newclient_id = "5";
+    var newclient_id = "6";
     var newclientToken = "432141dsadsa341fdsfdsfsdfsd3431";
 
-    //connect to Mlab / Mongodb Server
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://test:test@ds147842.mlab.com:47842/jedbprototype";
-
-
-    //codes to insert client data according to the variables above
     MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var newClientDetails = { client_id: newclient_id, client_token_braintree: newclientToken };
     db.collection("clientDetails").insertOne(newClientDetails, function(err, res) {
         if (err) throw err;
-        console.log("1 new client added| Client ID =" + newclient_id);
+        console.log("1 new client added");
         db.close();
     });
     });
 
-};
-
+//};
+var clientIdnn ;
 // find not wokring
 //seach existing data into mongoDB
-function findDB(){
+function findDB(clientIdnn){
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://test:test@ds147842.mlab.com:47842/jedbprototype";
+    var url = "mongodb://127.0.0.1:27017/jungleElementsDB";
 
     // search client id
-    var seachclient_id = "1";
+    var seachclient_id = clientIdnn;
 
 
     MongoClient.connect(url, function(err, db) {
     if (err) throw err;
   
-    db.collection("clientDetails").find({client_id:seachclient_id}).pretty();
+    db.collection("customers").find({client_id:seachclient_id}).pretty();
         console.log(result);
         db.close();
     });
@@ -72,7 +69,7 @@ function findDB(){
 // delete client data into mongoDB
 function deleteDB(){
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://test:test@ds147842.mlab.com:47842/jedbprototype";
+    var url = "mongodb://127.0.0.1:27017/jungleElementsDB";
 
     // client id to be deleted to be in the var
     var dele_client_id = "2";
@@ -94,7 +91,7 @@ function deleteDB(){
 //update data base test not in use for final product
 function updateDB(){
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://test:test@ds147842.mlab.com:47842/jedbprototype";
+    var url = "mongodb://127.0.0.1:27017/jungleElementsDB";
 
 
     var client_id1 = "1";
