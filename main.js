@@ -19,7 +19,7 @@ const app  = express();
 const customer = require('./nodemodjs/customer.js');
 //const http = require('http'); //http stuff, not needed yet
 //const fs = require('fs'); //filesystem, not needed yet
-const port = 3000;
+const port = 5000;
 
 /**
  * uses ejs engine to eval HTML files (to use <%= %> variables)
