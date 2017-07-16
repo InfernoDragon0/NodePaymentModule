@@ -40,9 +40,9 @@ app.use(express.static(path.join(__dirname, '/css')));
 app.use(express.static(path.join(__dirname, '/img')));
 
 /**
- * listens to @port 3000
+ * listens to dynamic port if online, and local testing uses 5000
  */
-app.listen(port);
+app.listen(process.env.PORT || port);
 
 app.get('/', function(req, res) { //base page
     res.render(path.join(__dirname + '/Home.html'));        
