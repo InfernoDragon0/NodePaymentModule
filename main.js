@@ -44,6 +44,10 @@ app.use(express.static(path.join(__dirname, '/img')));
  */
 app.listen(port);
 
+app.get('/', function(req, res) { //base page
+    res.render(path.join(__dirname + '/Home.html'));        
+});
+
 /**
  * on start at localhost:3000/pay?amount=10.00 generate the token
  * Requires Bot to send the query via POST
