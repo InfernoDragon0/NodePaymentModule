@@ -1,7 +1,7 @@
 var cosmosConfig = {}
 
-cosmosConfig.endpoint = "~your DocumentDB endpoint uri here~";
-cosmosConfig.primaryKey = "~your primary key here~";
+cosmosConfig.endpoint = "https://jepayphrase1.documents.azure.com:443/";
+cosmosConfig.primaryKey = "WNkCU96wTrjNXtXUknl1BTbyCdMMFZpigVBilvudK0CDnAC1Mfi16W4N1OhYgXrGvk73AaWX1EqctHxegWigFg==";
 
 cosmosConfig.database = {
     "id": "jElement"

@@ -8,7 +8,7 @@ var HttpStatusCodes = { NOTFOUND: 404 }
 var databaseUrl = `dbs/${cosmosConfig.database.id}`;
 var collectionUrl = `${databaseUrl}/colls/${cosmosConfig.collection.id}`;
 
-function_createDbIfNotExists(){
+function createDbIfNotExists(){
     client.readDatabase(databaseUrl, (err, result) => {
         if(err){
             client.createDatabase(cosmosConfig.database, (err, created) => {
@@ -25,4 +25,5 @@ function_createDbIfNotExists(){
             console.log(JSON.stringify(result));
         }
     });
-}
+};
+createDbIfNotExists();
