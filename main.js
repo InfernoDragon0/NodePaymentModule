@@ -64,25 +64,10 @@ app.get('/pay', function(req, res) { //change to app.post once debug finish
     if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer) { //change to req.body if POST
         res.send("<p>Please provide amount and customerid</p>");
         return;
-    }
-    if (!customer.findCustomer(req.query.customer)) {
-      res.send("<p>Customer ID is not found, please try again.</p>");
-      //this should not happen, but if customertoken got removed somehow, this will happen
-      //maybe add a new token to this client if this happens
-        return;
-    }
-    var sess = req.session;
-    
-    cvars.gateway.clientToken.generate({customerId: req.query.customer}, function (err, response) {
-      console.log(response.clientToken);      
-      sess.customer = req.query.customer;
-       console.log("customer is " + sess.customer);
-      res.render(path.join(__dirname + '/index.html'),
-    {
-      clientoken : response.clientToken,
-      amount: req.query.amount
-    });
-  });
+    }    
+    var sess = req.session;    
+    var page = path.join(__dirname + '/index.html');
+    customer.openCustomerPayPage(sess,req.query.amount,req.query.customer,res, page); //find customer, if customer not found overwrite but this should not happen
 });
 
 /**

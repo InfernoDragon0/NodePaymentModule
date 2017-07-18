@@ -4,7 +4,7 @@
 const cvars = require("./commonvariables.js");
 
 module.exports.chargeCard = chargeCard;
-module.exports.findCustomer = findCustomer;
+module.exports.openCustomerPayPage = openCustomerPayPage;
 module.exports.createCustomer = createCustomer;
 
 /**
@@ -81,20 +81,32 @@ function createCustomer(clientID,res) {
 
 /**
  * API Description:
- * Creates a customer token for the clientID that is given and stores it in the database
- * We do not need to store customer details on braintree as MongoDB will store the customer details already
+ * Finds a customer, if found, open the page
  * 
- * Call this upon Bot receiving a new account creation 
+ * 
+ * 
  * @param {*string} customerToken the customertoken to retrieve card details from
  */
-function findCustomer(customerToken) {
+function openCustomerPayPage(sess,amount,customerToken,res,page) {
     cvars.gateway.customer.find(customerToken, function(err, customer) {
         if(!err){
-            return true;
-        }
+            cvars.gateway.clientToken.generate({customerId: customerToken}, function (err, response) {
+            console.log(response.clientToken);      
+            sess.customer = customerToken;
+            console.log("customer is " + sess.customer);
+            res.render(page,
+            {
+            clientoken : response.clientToken,
+            amount: amount
+            });
+        });
+    }
         else {
+            res.send("<p>Customer ID is not found, please try again. Error: " + err.type + " - " + err.message + "</p>");
+            //this should not happen, but if customertoken got removed somehow, this will happen
+            //maybe add a new token to this client if this happens
             console.log(err)
-            return false;
+            
         };
 });
 }
