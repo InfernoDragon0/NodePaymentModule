@@ -14,6 +14,7 @@
   "author": "Shawn Lim, Caleb, Thaddeus, Hou Liang",
   "license": "ISC",
   "dependencies": {
+    "documentdb": "^1.12.0",
     "mongodb": "^2.2.30",
     "mysql": "^2.13.0"
   }

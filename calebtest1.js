@@ -4,28 +4,28 @@ var host = "https://jepayphrase1.documents.azure.com:443/";                     
 var masterKey = "WNkCU96wTrjNXtXUknl1BTbyCdMMFZpigVBilvudK0CDnAC1Mfi16W4N1OhYgXrGvk73AaWX1EqctHxegWigFg==";  // Add the masterkey of the endpoint
 var client = new DocumentClient(host, {masterKey: masterKey});
 
-var databaseDefinition = { id: "jElement" };
-var collectionDefinition = { id: "customerBTdetails" };
+var databaseDefinition = { id: "jElement1" };
+var collectionDefinition = { id: "customerBTdetails1" };
 var documentDefinition = { customer_id: "1", BTwallet_token: "token1" };
 
 client.createDatabase(databaseDefinition, function(err, database) {
     if(err) return console.log(err);
     console.log('created db');
-    console.log('test 1: '+ database);
+    console.log('test 1: '+ database.content);
 
     client.createCollection(database._self, collectionDefinition, function(err, collection) {
         if(err) return console.log(err);
         console.log('created collection');
-        console.log('test 1: '+ database);
-        console.log('test 2: '+ collection);
+        console.log('test 1: '+ database.content);
+        console.log('test 2: '+ collection.content);
 
         client.createDocument(collection._self, documentDefinition, function(err, document) {
             if(err) return console.log(err);
             console.log('Created Document with content: ', document.content);
                     console.log('----------------------');
-                    console.log('test 1: '+ database);
-                    console.log('test 2: '+ collection);
-                    console.log('test 3: '+ document);
+                    console.log('test 1: '+ database.content);
+                    console.log('test 2: '+ collection.content);
+                    console.log('test 3: '+ document.content);
 
 
             cleanup(client, database);
