@@ -62,7 +62,7 @@ app.get('/', function(req, res) { //base page
  */
 app.get('/pay', function(req, res) { //change to app.post once debug finish
     if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer) { //change to req.body if POST
-        res.send("<p>Please provide amount and customerid or more</p>");
+        res.send("<p>Please provide amount and customerid</p>");
         return;
     }
     if (!customer.findCustomer(req.query.customer)) {

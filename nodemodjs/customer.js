@@ -89,7 +89,7 @@ function createCustomer(clientID,res) {
  */
 function findCustomer(customerToken) {
     cvars.gateway.customer.find(customerToken, function(err, customer) {
-        if(err==0){
+        if(!err){
             return true;
         }
         else {
