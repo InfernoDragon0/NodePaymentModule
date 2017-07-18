@@ -61,24 +61,24 @@ app.get('/', function(req, res) { //base page
  * Example Request: /pay?amount=300.00
  */
 app.get('/pay', function(req, res) { //change to app.post once debug finish
-    if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer) { //change to req.body if POST
-        res.send("<p>Please provide amount and customerid</p>");
+    if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer || !req.query.merchantid) { //change to req.body if POST
+        res.send("<p>Please provide amount, customer and merchantid to pay to</p>");
         return;
     }    
     var sess = req.session;    
     var page = path.join(__dirname + '/index.html');
-    customer.openCustomerPayPage(sess,req.query.amount,req.query.customer,res, page); //find customer, if customer not found overwrite but this should not happen
+    customer.openCustomerPayPage(sess,req.query.amount,req.query.customer,req.query.merchantid, res, page); //find customer, if customer not found overwrite but this should not happen
 });
 
 /**
  * processpayment handler, customer.chargeCard for details
  */
 app.post('/processpayment', function(req, res) {
-  if(!req.body.amount || !req.body.nonce || !req.session.customer) {
-      res.send("<p>Please provide amount, nonce and customer token</p>");
+  if(!req.body.amount || !req.body.nonce || !req.session.customer || !req.body.merchantid) {
+      res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
       return;
   }
-  customer.chargeCard(req.body.amount,req.body.nonce,req.session.customer,res);
+  customer.chargeCard(req.body.amount,req.body.nonce,req.session.customer,req.body.merchantid,res);
 });
 
 /**

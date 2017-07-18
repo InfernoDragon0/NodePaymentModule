@@ -1,9 +1,10 @@
 <html>
   <link rel="stylesheet" href="materialize.css">
     <script> var clienttoken = '<%= clientoken %>';
-    var amount = '<%= amount %>';    
+    var amount = '<%= amount %>';   
+    var merchantid = '<%= merchantid %>'; 
      </script>
-    <h5 class="center-align">Payable Amount</h5>
+    <h5 class="center-align">Paying to Restaurant <script>document.write(merchantid)</script></h5>
     <h2 class="center-align">$<script>document.write(amount)</script></h2>
 <head>
   <meta charset="utf-8">

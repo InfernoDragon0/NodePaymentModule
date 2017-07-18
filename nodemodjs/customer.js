@@ -20,7 +20,8 @@ module.exports.createCustomer = createCustomer;
  * @param {*string} nonce 
  * @param {*var} res 
  */
-function chargeCard (amount,nonce,customertoken,res) {
+function chargeCard (amount,nonce,customertoken,merchantid,res) {
+    //use merchantid for database stuff
     cvars.gateway.transaction.sale({
         amount: amount,
         paymentMethodNonce: nonce,
@@ -87,7 +88,7 @@ function createCustomer(clientID,res) {
  * 
  * @param {*string} customerToken the customertoken to retrieve card details from
  */
-function openCustomerPayPage(sess,amount,customerToken,res,page) {
+function openCustomerPayPage(sess,amount,customerToken,merchantid,res,page) {
     cvars.gateway.customer.find(customerToken, function(err, customer) {
         if(!err){
             cvars.gateway.clientToken.generate({customerId: customerToken}, function (err, response) {
@@ -97,7 +98,8 @@ function openCustomerPayPage(sess,amount,customerToken,res,page) {
             res.render(page,
             {
             clientoken : response.clientToken,
-            amount: amount
+            amount: amount,
+            merchantid: merchantid
             });
         });
     }
