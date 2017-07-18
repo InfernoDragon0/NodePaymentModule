@@ -27,7 +27,7 @@ function chargeCard (amount,nonce,customertoken,res) {
         customerId: customertoken,
         options: {
             storeInVaultOnSuccess: true, //store the card with this customer on successful payment
-            submitForSettlement: true //must submit for settlement to process payment, can set to false to settle later
+            submitForSettlement: true //must submit for settlement to process payment, can set to false to settle later within 7 days
         }
     }, function (err, result) { //we can send the whole RESULT so that the bot can manually use the json data
         if(!err){
@@ -90,10 +90,11 @@ function createCustomer(clientID,res) {
 function findCustomer(customerToken) {
     cvars.gateway.customer.find(customerToken, function(err, customer) {
         if(err==0){
-            chargecard(customer);
+            return true;
         }
         else {
             console.log(err)
+            return false;
         };
 });
 }

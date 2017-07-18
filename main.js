@@ -61,10 +61,16 @@ app.get('/', function(req, res) { //base page
  * Example Request: /pay?amount=300.00
  */
 app.get('/pay', function(req, res) { //change to app.post once debug finish
-  if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer) { //change to req.body if POST
-        res.send("<p>Please use localhost:3000/pay?amount=0.01&customer=someid or more</p>");
+    if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer) { //change to req.body if POST
+        res.send("<p>Please provide amount and customerid or more</p>");
         return;
-      }
+    }
+    if (!customer.findCustomer(req.query.customer)) {
+      res.send("<p>Customer ID is not found, please try again.</p>");
+      //this should not happen, but if customertoken got removed somehow, this will happen
+      //maybe add a new token to this client if this happens
+        return;
+    }
     var sess = req.session;
     
     cvars.gateway.clientToken.generate({customerId: req.query.customer}, function (err, response) {
