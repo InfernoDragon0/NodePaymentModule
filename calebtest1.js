@@ -4,7 +4,7 @@ var host = "https://jepayphrase1.documents.azure.com:443/";                     
 var masterKey = "WNkCU96wTrjNXtXUknl1BTbyCdMMFZpigVBilvudK0CDnAC1Mfi16W4N1OhYgXrGvk73AaWX1EqctHxegWigFg==";  // Add the masterkey of the endpoint
 var client = new DocumentClient(host, {masterKey: masterKey});
 
-var databaseDefinition = { id: "jElement1" };
+var databaseDefinition = { id: "jElement" };
 var collectionDefinition = { id: "customerBTdetails1" };
 var documentDefinition = { customer_id: "1", BTwallet_token: "token1" };
 

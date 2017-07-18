@@ -5,8 +5,11 @@ var client = new docdbClient(cosmosConfig.uri,{masterKey: cosmosConfig.primaryKe
 
 var HttpStatusCodes = { NOTFOUND: 404 }
 
-var databaseUrl = `dbs/${cosmosConfig.database.id}`;
+
+var databaseUrl =`dbs/${cosmosConfig.database.id}`;
 var collectionUrl = `${databaseUrl}/colls/${cosmosConfig.collection.id}`;
+console.log (databaseUrl);
+
 
 function createDbIfNotExists(){
     client.readDatabase(databaseUrl, (err, result) => {
