@@ -6,13 +6,18 @@
 </head>
 <script src="authClient.js"></script>
 <body>
-<form action="" method="post">
-<p>Client ID</p>
-<input type="text" name="userid" placeholder="Client ID"><br>
-<p>Pin</p>
-<input type="password" name="pin" placeholder="pin"><br>
-<button type="submit" value="Proceed" onclick="sendAuthRequest();">Authenticate</button>
-</form>
+    <div class="container">
+        <div class="input-field col s6">
+            <input type="text" id="userid"><br>
+            <label for="userid">User ID</label>
+        </div>
+        
+        <div class="input-field col s6">
+            <input type="password" id="pin"><br>
+            <label for="pin">Pin</label>
+        </div>
+        <button class="waves-effect waves-light btn" type="submit" value="Proceed" onclick="sendAuthRequest();">Authenticate</button>
+    </div>
 </body>
 
 </html>
