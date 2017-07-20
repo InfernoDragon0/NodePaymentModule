@@ -13,18 +13,34 @@ cosmosConfig.collection = {
 // insert data here
 cosmosConfig.documents = [
     {
+        "id": "1",
         "customer_id": "1",
         "customer_BTwalletToken":"token1"
     },
         {
+        "id": "2",
         "customer_id": "2",
         "customer_BTwalletToken":"token1"
     },
         {
+        "id": "3",
         "customer_id": "3",
         "customer_BTwalletToken":"token1"
     }
     ];
 
+cosmosConfig.replaceDocuments = [
+    {
+        "id": "2",
+
+    }
+    ];
+
+cosmosConfig.deleteDocuments = [
+    {
+        "id": "1",
+
+    }
+    ];
 module.exports = cosmosConfig;
 
