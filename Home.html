@@ -4,16 +4,21 @@
 <head>    
     <h1>Jungle Element Login Page</h1>
 </head>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.js"
+  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
+<script src="materialize.js"></script>
 <script src="authClient.js"></script>
 <body>
     <div class="container">
         <div class="input-field col s6">
-            <input type="text" id="userid"><br>
+            <input type="text" id="userid" class="validate"><br>
             <label for="userid">User ID</label>
         </div>
         
         <div class="input-field col s6">
-            <input type="password" id="pin"><br>
+            <input type="password" id="pin" class="validate"><br>
             <label for="pin">Pin</label>
         </div>
         <button class="waves-effect waves-light btn" type="submit" value="Proceed" onclick="sendAuthRequest();">Authenticate</button>
