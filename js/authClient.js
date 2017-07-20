@@ -1,5 +1,7 @@
+var http = new XMLHttpRequest();
+
 function sendAuthRequest() {
-    var user = document.getElementById('user').value;
+    var user = document.getElementById('userid').value;
     var pin = document.getElementById('pin').value;
 
     sendPost("/authenticate", "user=" + user + "&pin=" + pin);
