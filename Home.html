@@ -3,12 +3,14 @@
 <head>
     <h1>Jungle Element Login Page</h1>
 </head>
-
+<script src="authClient.js"></script>
 <body>
 <form action="" method="post">
-Client ID : &nbsp &nbsp
+<p>Client ID</p>
 <input type="text" name="userid" placeholder="Client ID"><br>
-<button type="submit" value="Proceed" onclick="updateDB();">Call</button> &nbsp
+<p>Pin</p>
+<input type="password" name="pin" placeholder="pin"><br>
+<button type="submit" value="Proceed" onclick="sendAuthRequest();">Authenticate</button>
 </form>
 </body>
 

@@ -12,6 +12,8 @@ var ejs = require('ejs'); //ejs is not express, but is a extension to express
 var path = require("path"); //pathing system
 var bodyParser = require('body-parser'); //parse POST data
 var session = require('express-session'); //temporary to store sensitive data, see if theres better way
+var authenticator = require("./nodemodjs/authenticator.js");
+
 const cvars = require("./nodemodjs/commonvariables.js");
 
 const express = require('express'); //express is good
@@ -49,6 +51,34 @@ app.get('/', function(req, res) { //base page
 });
 
 /**
+* API Description: 
+ * Authentication for 6 digit pins and users (not connected to database yet)
+ * 
+ * user: the clientid to authenticate
+ * pin: the pin to check against the clientid 
+ * test variables are USER : PIN {"1" : "121312", "2" : "131154", "3" : "665544"};
+ */
+app.post('/authenticate', function(req, res) { //base page
+    if (!req.body.user || !req.body.pin || !req.body.pin >= 6) {
+      res.send("Please input a userid and a 6 digits pin");
+      return;
+    }
+
+    if (authenticator.checkAuthorized(req.session)) {
+        res.send("Authorized. At " + req.session.authorized);
+    }
+    else {
+        if (authenticator.authRequest(req.session, req.query.user, req.query.pin)) {
+          res.send("Authorized. At " + req.session.authorized);
+        }
+        else {
+          res.send("Invalid user and pin combination. try again!");
+        }
+    }
+});
+
+
+/**
  * on start at localhost:3000/pay?amount=10.00 generate the token
  * Requires Bot to send the query via POST
  * 
@@ -57,15 +87,20 @@ app.get('/', function(req, res) { //base page
  * 
  * amount: the amount to pay, 1 = $1.00
  * customer: the token from the customer
- * To use: send a request to localhost:3000/pay?amount=(amount)&customer=(token)
- * Example Request: /pay?amount=300.00
+ * To use: send a request to localhost:3000/pay?amount=(amount)&customer=(token)&merchantid=(merchant)
+ * Example Request: /pay?amount=300.00&customer=663573599&merchantid=123
  */
 app.get('/pay', function(req, res) { //change to app.post once debug finish
+    var sess = req.session;
+    //if (!authenticator.checkAuthorized(sess)) {
+    //    res.render(path.join(__dirname + '/Home.html'));
+    //    return;
+    //}//check auth later
     if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer || !req.query.merchantid) { //change to req.body if POST
         res.send("<p>Please provide amount, customer and merchantid to pay to</p>");
         return;
     }    
-    var sess = req.session;    
+    
     var page = path.join(__dirname + '/index.html');
     customer.openCustomerPayPage(sess,req.query.amount,req.query.customer,req.query.merchantid, res, page); //find customer, if customer not found overwrite but this should not happen
 });
