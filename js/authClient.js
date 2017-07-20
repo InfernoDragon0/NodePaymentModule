@@ -4,6 +4,10 @@ function sendAuthRequest() {
     var user = document.getElementById('userid').value;
     var pin = document.getElementById('pin').value;
 
+    if (pin.length != 6) {
+        return;
+    }
+
     sendPost("/authenticate", "user=" + user + "&pin=" + pin);
 }
 

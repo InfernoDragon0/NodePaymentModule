@@ -59,13 +59,13 @@ app.get('/', function(req, res) { //base page
  * test variables are USER : PIN {"1" : "121312", "2" : "131154", "3" : "665544"};
  */
 app.post('/authenticate', function(req, res) { //base page
-    if (!req.body.user || !req.body.pin || !req.body.pin.length == 6) {
+    if (!req.body.user || !req.body.pin || req.body.pin.length != 6) {
       res.send("Please input a userid and a 6 digits pin");
       return;
     }
 
     if (authenticator.checkAuthorized(req.session)) {
-        res.send("Authorized. At " + req.session.authorized);
+        res.send("Already Authorized. At " + req.session.authorized);
     }
     else {
         if (authenticator.authRequest(req.session, req.body.user, req.body.pin)) {

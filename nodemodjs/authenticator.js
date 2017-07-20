@@ -18,7 +18,9 @@ function checkAuthorized(session) {
     }
 }
 
-function authRequest(sess, res, user, pin) {
+function authRequest(sess, user, pin) {
+    console.log("pin is " + pin);
+    console.log("user is" + user);
     if (fakepinAuths.hasOwnProperty(user)) {
         if (pin == fakepinAuths[user]) {
             sess.authorized = Math.floor(Date.now() / 1000); //sets current time as authorized timing
