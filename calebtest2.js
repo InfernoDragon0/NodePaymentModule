@@ -78,5 +78,67 @@ function getUserDocument(documents) {
         });
     }
 }
+//getUserDocument(cosmosConfig.documents);
 
-getUserDocument(cosmosConfig.documents);
+(function query() {
+    return new Promise((resolve, reject) =>{
+        client.queryDocuments(collectionUrl,
+        "Select * from root r where r.customer_id='1'").toArray((err, results)=>{
+            if (err) {
+                console.log(JSON.stringify(err));
+            }
+            else{
+                for (let result of results) {
+                    console.log(JSON.stringify(result));
+                }
+                resolve(results);
+            }
+        });
+    });
+}());
+*/
+console.log (cosmosConfig.documents[1]);
+//update database
+
+function replace(documents) {
+    let documentUrl=`${collectionUrl}/docs/${documents.customer_id}`;
+    console.log (documentUrl);
+    documents.customer_BTwalletToken = "token2";
+    console.log (documents);
+    return new Promise((resolve, reject) => {
+        client.replaceDocument(documentUrl, documents, (err, result) => {
+             if (err) {
+                console.log(JSON.stringify(err));
+            }
+            else{
+                resolve(result);
+            }
+        });
+    });
+}
+
+replace(cosmosConfig.documents[1]);
+
+
+
+
+
+
+
+// jus for tesing
+(function query() {
+    return new Promise((resolve, reject) =>{
+        client.queryDocuments(collectionUrl,
+        "Select * from root r where r.customer_id='2'").toArray((err, results)=>{
+            if (err) {
+                console.log(JSON.stringify(err));
+            }
+            else{
+                for (let result of results) {
+                    console.log(JSON.stringify(result));
+                }
+                resolve(results);
+            }
+        });
+    });
+}());

@@ -13,15 +13,15 @@ cosmosConfig.collection = {
 // insert data here
 cosmosConfig.documents = [
     {
-        "customer_id": "4",
+        "customer_id": "1",
         "customer_BTwalletToken":"token1"
     },
         {
-        "customer_id": "5",
+        "customer_id": "2",
         "customer_BTwalletToken":"token1"
     },
         {
-        "customer_id": "6",
+        "customer_id": "3",
         "customer_BTwalletToken":"token1"
     }
     ];
