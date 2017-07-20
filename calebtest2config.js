@@ -8,10 +8,26 @@ cosmosConfig.database = {
 };
 
 cosmosConfig.collection = {
-    "id": "customerJEPayDetail"
+    "id": "customerBTDetail"
 };
 // insert data here
-cosmosConfig.documents = [
+
+
+cosmosConfig.replaceDocuments = [
+    {
+        "id": "1",
+
+    }
+    ];
+
+cosmosConfig.deleteDocuments = [
+    {
+        "id": "1",
+
+    }
+    ];
+
+cosmosConfig.customerBTDetaildocuments = [
     {
         "id": "1",
         "customer_id": "1",
@@ -26,20 +42,6 @@ cosmosConfig.documents = [
         "id": "3",
         "customer_id": "3",
         "customer_BTwalletToken":"token1"
-    }
-    ];
-
-cosmosConfig.replaceDocuments = [
-    {
-        "id": "2",
-
-    }
-    ];
-
-cosmosConfig.deleteDocuments = [
-    {
-        "id": "1",
-
     }
     ];
 ///////////////////////////////////////////////////

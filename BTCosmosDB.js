@@ -47,7 +47,7 @@ function createCollectionIfNotExists(){
         }
     });
 };
-createCollectionIfNotExists();
+//createCollectionIfNotExists();
 
 
 // insert documents, edit documents in the config file
@@ -80,146 +80,72 @@ function getUserDocument(documents) {
         });
     }
 }
-getUserDocument(cosmosConfig.customerJEPayDetailDocuments);
+//getUserDocument(cosmosConfig.customerBTDetaildocuments);
+
+
+// insert new client with new bttoken
+function insertNewClientDataInput(data){
+client.createDocument(collectionUrl, data, (err,created)=>{
+    if(err){
+     console.log(JSON.stringify(err));                 
+    }
+    else{
+    console.log(JSON.stringify(created));
+    }
+    });
+};
+    function insertNewClient(new_id,newcustomer_id,newBTwalletToken){
+    // var new_id = '6';
+    // var newcustomer_id = '6';
+    // var newBTwalletToken = 'token1';
+
+    insertNewClientDataInput({'id': new_id,'customer_id': newcustomer_id,'customer_BTwalletToken':newBTwalletToken});
+    }
+insertNewClient('6','6','token 1');
 
 
 
 
 
-
-
-
-
-// PLEASE HELP HERE //
-
- 
- 
-//  // Run select query in Document DB
-// function query() {
-//     return new Promise((resolve, reject) =>{
-//         client.queryDocuments(collectionUrl,
-//         "Select * from root r where r.customer_id='1'").toArray((err, results)=>{
-//             if (err) {
-//                 console.log(JSON.stringify(err));
-//             }
-//             else{
-//                 for (let result of results) {
-//                     console.log(JSON.stringify(result));
-//                 }
-//                 resolve(results);
-//             }
-//         });
-//     });
-// };
-// //query();
-
-// function query() {
-//     return new Promise((resolve, reject) =>{
-//         client.queryDocuments(collectionUrl,
-//         "Select * from root r where r.customer_id='1'").toArray((err, results)=>{
-//             console.log("adsadsa"+JSON.stringify(results));
-//             if (err) {
-//                 console.log(JSON.stringify(err));
-//             }
-//             else{
-//                 for (let result of results) {
-//                     let resultString = JSON.stringify(result);
-//                     console.log(`\tQuery returned ${resultString}`);
-
-
-
-
-//                     console.log(JSON.stringify(result));
-//                     var test1 = JSON.stringify(result)
-//                     db.close();
-//             }
-//                             console.log("tester: "+test1);
-//                             var retrieved_client_id = results["customer_id"];
-//                             var retrieved_client_token = results["customer_BTwalletToken"];
-//                             console.log("---");
-//                             console.log("---");
-//                             console.log("return data from server");
-//                             console.log("Client ID :" + retrieved_client_id);
-//                             console.log("Corresponding token :" + retrieved_client_token);
-//                 resolve(results);
-//                 console.log("testest"+results);
-//             }
-//         });
-//     });
-// };
-// query();
-
- // Run select query in Document DB
-function query() {
+ // find client token for existing client ID
+function findBTtoken(customerID) {
     return new Promise((resolve, reject) =>{
         client.queryDocuments(collectionUrl,
-        "Select * from root r where r.customer_id='1'").toArray((err, results)=>{
+        "Select * from root r where r.customer_id='"+customerID+"'").toArray((err, results)=>{
             if (err) {
                 console.log(JSON.stringify(err));
             }
             else{
                 for (let result of results) {
-                    console.log(JSON.stringify(result));
-                }
-                resolve(results);
-            }
-        });
-    });
-};
-//query();
-
-function queryCollection() {
-    return new Promise((resolve, reject) => {
-        client.queryDocuments(
-            collectionUrl,
-             "Select * from root r where r.customer_id='1'"
-        ).toArray((err, results) => {
-            if (err) reject(err)
-            else {
-                for (var queryResult of results) {
-                    let resultString = JSON.stringify(queryResult);
-                  //  console.log(`\tQuery returned ${resultString}`);
-                }
-                console.log();
-                resolve(results);
+                    // console.log(JSON.stringify(result));
+                //                     console.log("----------");
+                // console.log(JSON.stringify(result));
+                console.log("----------");
+                var scustmoer_id = result["customer_id"];
+                var scustomer_BTtoken= result["customer_BTwalletToken"]
+               // console.log(result);
+                console.log("----------");
+                console.log("Searching Client ID: "+scustmoer_id);
+                console.log("Coresponding BT Token: "+scustomer_BTtoken);
+                resolve(result);
                 
+                }
+
+              //resolve(results);
             }
         });
     });
 };
-//queryCollection();
+///findBTtoken(3);
 
 
-
-
-
-// here//
-// i wan to run the query and store the result, i have no idea how to store the result
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//update database
-function replace(documents) {
+//Change BT wallet token
+function replace(documents,token) {
     let documentUrl=`${collectionUrl}/docs/${documents.id}`;
     console.log (documentUrl);
-    documents.customer_BTwalletToken = "token2";
+    documents.customer_id = documents.id;
+    documents.customer_BTwalletToken = token;
+    console.log ("Updated Documents");
     console.log (documents);
     return new Promise((resolve, reject) => {
         client.replaceDocument(documentUrl, documents, (err, result) => {
@@ -232,8 +158,9 @@ function replace(documents) {
         });
     });
 }
-// // [0] = 1 and [1] = 2
-//replace(cosmosConfig.replaceDocuments[0]);
+// // id = client id 
+// // replace(id,token)
+//replace({"id": "3"}, "token 1");
 
 
 //Delete document, change the id in the config file before running the function
