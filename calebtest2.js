@@ -47,7 +47,7 @@ function createCollectionIfNotExists(){
         }
     });
 };
-//createCollectionIfNotExists();
+createCollectionIfNotExists();
 
 
 // insert documents, edit documents in the config file
@@ -80,7 +80,7 @@ function getUserDocument(documents) {
         });
     }
 }
-
+getUserDocument(cosmosConfig.customerJEPayDetailDocuments);
 
 
 
@@ -92,7 +92,7 @@ function getUserDocument(documents) {
 
 // PLEASE HELP HERE //
 
- //getUserDocument(cosmosConfig.documents);
+ 
  
 //  // Run select query in Document DB
 // function query() {
@@ -187,7 +187,7 @@ function queryCollection() {
         });
     });
 };
-queryCollection();
+//queryCollection();
 
 
 
@@ -233,7 +233,7 @@ function replace(documents) {
     });
 }
 // // [0] = 1 and [1] = 2
-replace(cosmosConfig.replaceDocuments[0]);
+//replace(cosmosConfig.replaceDocuments[0]);
 
 
 //Delete document, change the id in the config file before running the function
