@@ -1,4 +1,4 @@
-var cosmosConfig = require("./calebtest2config");
+var cosmosConfig = require("./BTCosmosconfig");
 var docdbClient = require("documentdb").DocumentClient;
 
 var client = new docdbClient(cosmosConfig.endpoint,{masterKey: cosmosConfig.primaryKey});
@@ -84,7 +84,7 @@ function getUserDocument(documents) {
 
 
 // insert new client with new bttoken
-function insertNewClientDataInput(data){
+function insertNewCustomerDataInput(data){
 client.createDocument(collectionUrl, data, (err,created)=>{
     if(err){
      console.log(JSON.stringify(err));                 
@@ -94,14 +94,15 @@ client.createDocument(collectionUrl, data, (err,created)=>{
     }
     });
 };
-    function insertNewClient(new_id,newcustomer_id,newBTwalletToken){
-    // var new_id = '6';
+    function insertNewCustomer(newcustomer_id,newBTwalletToken){
+    var new_id = newcustomer_id;
     // var newcustomer_id = '6';
     // var newBTwalletToken = 'token1';
 
-    insertNewClientDataInput({'id': new_id,'customer_id': newcustomer_id,'customer_BTwalletToken':newBTwalletToken});
-    }
-insertNewClient('6','6','token 1');
+    insertNewCustomerDataInput({'id': new_id,'customer_id': newcustomer_id,'customer_BTwalletToken':newBTwalletToken});
+}
+// how to use - inserNewClient("enter new customer_id here", "corresponding bt token")
+insertNewCustomer('17','token 17');
 
 
 
@@ -136,14 +137,16 @@ function findBTtoken(customerID) {
         });
     });
 };
-///findBTtoken(3);
+// // findBTtoken(<customer_id>)
+//findBTtoken(16);
 
 
 //Change BT wallet token
 function replace(documents,token) {
-    let documentUrl=`${collectionUrl}/docs/${documents.id}`;
+    let documentUrl=`${collectionUrl}/docs/${documents.customer_id}`;
     console.log (documentUrl);
-    documents.customer_id = documents.id;
+    documents.id = documents.customer_id;
+    //documents.customer_id = documents.id;
     documents.customer_BTwalletToken = token;
     console.log ("Updated Documents");
     console.log (documents);
@@ -159,8 +162,8 @@ function replace(documents,token) {
     });
 }
 // // id = client id 
-// // replace(id,token)
-//replace({"id": "3"}, "token 1");
+// // replace(customer_id,token)
+//replace({"customer_id": "16"}, "token 16");
 
 
 //Delete document, change the id in the config file before running the function
