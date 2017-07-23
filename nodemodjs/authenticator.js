@@ -10,7 +10,7 @@ var encryption = 'sha256';
 module.exports.checkAuthorized = checkAuthorized;
 module.exports.authRequest = authRequest;
 
-function checkAuthorized(session) {
+function checkAuthorized(session) { //doesnt do anything yet cos no session stuff added
     var timenow = Math.floor(Date.now() / 1000);
     if (timenow - session.authorized > timetoexpire) {
         return true;
@@ -21,13 +21,10 @@ function checkAuthorized(session) {
 }
 
 function authRequest(sess, user, pin) {
-    console.log("pin is " + pin);
-    console.log("user is" + user);   
+
     if (fakepinAuths.hasOwnProperty(user)) {
         var hashverify = crypto.createHash('sha256').update(pin).digest('base64');
-        console.log("hash is " + fakepinAuths[user]);
-        console.log("hashed pin is " + crypto.createHash('sha256').update(pin).digest('base64'));
-        if (hashverify == fakepinAuths[user]) {
+        if (hashverify == fakepinAuths[user]) { //TODO database.getSHA256Pin(user)
             sess.authorized = Math.floor(Date.now() / 1000); //sets current time as authorized timing
             return true;
         }

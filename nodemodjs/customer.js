@@ -34,6 +34,8 @@ function chargeCard (amount,nonce,customertoken,merchantid,res) {
         if(!err){
             if (result.success) {
                 res.send("Payment of $" + amount + " has been made successfully. Thank you!");
+                //TODO: database stuff
+                //database.addTransaction(customerid, merchantid, amountpaid, receiptid(to be exposed)) ***
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
@@ -68,11 +70,13 @@ function createCustomer(clientID,res) {
         if (!err) {
             if (result.success) {
                 res.send("<p>Customer Token is: " + result.customer.id + "</p><p> Created for client ID " + clientID + "</p>");
+                //TODO: database stuff
+                //database.addCustomer(customerid, customertoken) *** check if customer token exist, if exist try not to overwrite
             }
             else {
                 res.send("Error occurred creating customer: " + result);
             }
-        //TODO: MongoDB connection to CHECK and update database with clientID and customertoken
+        
         }
         else {
             res.send("API Error occurred: " + err);
