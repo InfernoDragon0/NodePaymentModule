@@ -1,4 +1,6 @@
 const storageAzure = require('azure-storage')
+const retryOperations = new azure.ExponentialRetryPolicyFilter();
+const tblSvc = azure.createTableService(config.tblAccountName, config.tblAccessKey1).withFilter(retryOperations);
 
 let AzureWebJobsStorage = 'DefaultEndpointsProtocol=https;AccountName=jiraffeteststorage;AccountKey=aojV/ZUm2XJWgE31TYp4SK4igk5/6UVCjn+fagDG0Hr0BemXs9PipCJy5Sca+VwpaT7eYLozaCDL9YHyCdq9AA==;EndpointSuffix=core.windows.net'
 

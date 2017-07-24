@@ -6,6 +6,7 @@
  */
 const cvars = require("./commonvariables.js");
 var BTDatabasefunction = require("./BTCosmosDB");
+var queuePayfunction = require("./queuePayDetails");
 module.exports.chargeCard = chargeCard;
 module.exports.openCustomerPayPage = openCustomerPayPage;
 module.exports.createCustomer = createCustomer;
@@ -49,6 +50,8 @@ function chargeCard (amount,nonce,customertoken,merchantid,res) {
                 console.log (transactionDetails.transactionAmount);
                 console.log ( "test 3 :");
                 console.log (transactionDetails.transactionTimeStamp);
+                // address need to be inputed to work
+               // queuePayfunction.sendPayDetailsToQueueSucess(address,transactionDetails);
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
