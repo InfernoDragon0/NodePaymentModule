@@ -51,7 +51,7 @@ function chargeCard (amount,nonce,customertoken,merchantid,res) {
                 console.log ( "test 3 :");
                 console.log (transactionDetails.transactionTimeStamp);
                 // address need to be inputed to work
-               // queuePayfunction.sendPayDetailsToQueueSucess(address,transactionDetails);
+                queuePayfunction.sendPayDetailsToQueueSucess("123",transactionDetails);
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
