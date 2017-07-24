@@ -1,8 +1,11 @@
+
+
+
 /**
  * node JS file for customer related stuff
  */
 const cvars = require("./commonvariables.js");
-
+var BTDatabasefunction = require("./BTCosmosDB");
 module.exports.chargeCard = chargeCard;
 module.exports.openCustomerPayPage = openCustomerPayPage;
 module.exports.createCustomer = createCustomer;
@@ -36,6 +39,7 @@ function chargeCard (amount,nonce,customertoken,merchantid,res) {
                 res.send("Payment of $" + amount + " has been made successfully. Thank you!");
                 //TODO: database stuff
                 //database.addTransaction(customerid, merchantid, amountpaid, receiptid(to be exposed)) ***
+                
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
@@ -71,7 +75,9 @@ function createCustomer(clientID,res) {
             if (result.success) {
                 res.send("<p>Customer Token is: " + result.customer.id + "</p><p> Created for client ID " + clientID + "</p>");
                 //TODO: database stuff
+
                 //database.addCustomer(customerid, customertoken) *** check if customer token exist, if exist try not to overwrite
+                BTDatabasefunction.insertNewCustomer(clientID,result.customer.id);
             }
             else {
                 res.send("Error occurred creating customer: " + result);

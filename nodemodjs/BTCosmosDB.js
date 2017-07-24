@@ -103,7 +103,7 @@ client.createDocument(collectionUrl, data, (err,created)=>{
     insertNewCustomerDataInput({'id': new_id,'customer_id': newcustomer_id,'customer_BTwalletToken':newBTwalletToken});
 }
 // how to use - inserNewClient("enter new customer_id here", "corresponding bt token")
-insertNewCustomer('17','token 17');
+//insertNewCustomer('17','token 17');
 
 
 
@@ -186,3 +186,4 @@ function deleteDoc(documents) {
 
 
 module.exports = BTDatabasefunction;
+module.exports.insertNewCustomer = insertNewCustomer;
