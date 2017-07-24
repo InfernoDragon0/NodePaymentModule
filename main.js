@@ -97,20 +97,35 @@ app.get('/pay', function (req, res) { //change to app.post once debug finish
     //    res.render(path.join(__dirname + '/Home.html'));
     //    return;
     //}//check auth later
-    if (!req.query.amount || req.query.amount < 0.01 || !req.query.customer || !req.query.merchantid) { //change to req.body if POST
+    if (!req.query.amount || req.query.amount < 0.01 || !req.query.customer || !req.query.merchantid || !req.query.savedAddress) { //change to req.body if POST
         res.send("<p>Please provide amount, customer and merchantid to pay to</p>");
         return;
     }
-
     var page = path.join(__dirname + '/index.html');
     var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
     cpromise.then(function(value) {
-                console.log("test" + value);
-                customer.openCustomerPayPage(sess, req.query.amount, value, req.query.merchantid, res, page); //find customer, if customer not found overwrite but this should not happen
+                customer.openCustomerPay(sess, req.query.amount, value, req.query.merchantid, res, page, req.query.savedAddress); //find customer, if customer not found overwrite but this should not happen
 
     });
 });
 
+app.post('/pay', function (req, res) {
+    var sess = req.session;
+    //if (!authenticator.checkAuthorized(sess)) {
+    //    res.render(path.join(__dirname + '/Home.html'));
+    //    return;
+    //}//check auth later
+    if (!req.body.amount || req.body.amount < 0.01 || !req.body.customer || !req.body.merchantid || !req.body.savedAddress) { //change to req.body if POST
+        res.send("<p>Please provide amount, customer and merchantid to pay to</p>");
+        return;
+    }
+    var page = path.join(__dirname + '/index.html');
+    var cpromise = BTDatabaseFunction.findBTtoken(req.body.customer);
+    cpromise.then(function(value) {
+                customer.openCustomerPay(sess, req.body.amount, value, req.body.merchantid, res, page, req.body.savedAddress); //find customer, if customer not found overwrite but this should not happen
+
+    });
+});
     /**
      * processpayment handler, customer.chargeCard for details
      */
@@ -119,7 +134,9 @@ app.get('/pay', function (req, res) { //change to app.post once debug finish
             res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
             return;
         }
-        customer.chargeCard(req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res);
+        var storageAddress = req.session.storageAddress;
+        console.log("storeaddress is " + storageAddress);
+        customer.chargeCard(req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res, storageAddress);
     });
 
     /**

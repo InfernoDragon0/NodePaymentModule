@@ -8,9 +8,10 @@ const cvars = require("./commonvariables.js");
 var BTDatabasefunction = require("./BTCosmosDB");
 var queuePayfunction = require("./queuePayDetails");
 module.exports.chargeCard = chargeCard;
-module.exports.openCustomerPayPage = openCustomerPayPage;
+module.exports.openCustomerPay = openCustomerPay;
 module.exports.createCustomer = createCustomer;
 module.exports.retrieveCustomerCardDetails=retrieveCustomerCardDetails;
+module.exports.openCustomerPayWithoutPage = openCustomerPayWithoutPage;
 /**
  * API Description: 
  * This is process payment method for single card charges
@@ -24,7 +25,7 @@ module.exports.retrieveCustomerCardDetails=retrieveCustomerCardDetails;
  * @param {*string} nonce 
  * @param {*var} res 
  */
-function chargeCard (amount,nonce,customertoken,merchantid,res) {
+function chargeCard (amount,nonce,customertoken,merchantid,res,storageAddress) {
     //use merchantid for database stuff
     cvars.gateway.transaction.sale({
         amount: amount,
@@ -51,7 +52,7 @@ function chargeCard (amount,nonce,customertoken,merchantid,res) {
                 console.log ( "test 3 :");
                 console.log (transactionDetails.transactionTimeStamp);
                 // address need to be inputed to work
-                queuePayfunction.sendPayDetailsToQueueSucess("123",transactionDetails);
+                queuePayfunction.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
@@ -110,13 +111,14 @@ function createCustomer(clientID,res) {
  * 
  * @param {*string} customerToken the customertoken to retrieve card details from
  */
-function openCustomerPayPage(sess,amount,customerToken,merchantid,res,page) {
+function openCustomerPay(sess,amount,customerToken,merchantid,res,page,savedaddress) {
     cvars.gateway.customer.find(customerToken, function(err, customer) {
         if(!err){
             cvars.gateway.clientToken.generate({customerId: customerToken}, function (err, response) {
-            console.log(response.clientToken);      
             sess.customer = customerToken;
-            console.log("customer is " + sess.customer);
+            sess.storageAddress= savedaddress;
+            console.log("is s" + sess.customer);
+            console.log("test address : "+sess.storageAddress);
             res.render(page,
             {
             clientoken : response.clientToken,
@@ -136,7 +138,7 @@ function openCustomerPayPage(sess,amount,customerToken,merchantid,res,page) {
 });
 }
 
-function openCustomerPayPage(sess,amount,customerToken,merchantid,res,page) {
+function openCustomerPayWithoutPage(sess,amount,customerToken,merchantid,res,page) {
     cvars.gateway.customer.find(customerToken, function(err, customer) {
         if(!err){
             cvars.gateway.clientToken.generate({customerId: customerToken}, function (err, response) {
