@@ -13,11 +13,11 @@ var path = require("path"); //pathing system
 var bodyParser = require('body-parser'); //parse POST data
 var session = require('express-session'); //temporary to store sensitive data, see if theres better way
 var authenticator = require("./nodemodjs/authenticator.js");
-
+var BTDatabaseFunction = require("./nodemodjs/BTCosmosDB");
 const cvars = require("./nodemodjs/commonvariables.js");
 
 const express = require('express'); //express is good
-const app  = express();
+const app = express();
 const customer = require('./nodemodjs/customer.js');
 //const http = require('http'); //http stuff, not needed yet
 //const fs = require('fs'); //filesystem, not needed yet
@@ -28,10 +28,11 @@ const port = 5000;
  */
 app.engine('html', require('ejs').renderFile);
 app.use(session({
-  secret: 'whatsecretshallweuse kitten',//session secret to sign sessions
-  resave: true, //force save
-  saveUninitialized: true,
-  /*cookie: { secure: true }*/})); //secure needs HTTPS, cookies will not be stored if running from HTTP with this option
+    secret: 'whatsecretshallweuse kitten',//session secret to sign sessions
+    resave: true, //force save
+    saveUninitialized: true,
+    /*cookie: { secure: true }*/
+})); //secure needs HTTPS, cookies will not be stored if running from HTTP with this option
 app.use(bodyParser.json()); // supporting POST data
 app.use(bodyParser.urlencoded({ extended: true })); // supportting POST data
 /**
@@ -46,8 +47,8 @@ app.use(express.static(path.join(__dirname, '/img')));
  */
 app.listen(process.env.PORT || port);
 
-app.get('/', function(req, res) { //base page
-    res.render(path.join(__dirname + '/Home.html'));        
+app.get('/', function (req, res) { //base page
+    res.render(path.join(__dirname + '/Home.html'));
 });
 
 /**
@@ -58,10 +59,10 @@ app.get('/', function(req, res) { //base page
  * pin: the pin to check against the clientid 
  * test variables are USER : PIN {"1" : "121312", "2" : "131154", "3" : "665544"};
  */
-app.post('/authenticate', function(req, res) { //base page
+app.post('/authenticate', function (req, res) { //base page
     if (!req.body.user || !req.body.pin || req.body.pin.length != 6) {
-      res.send("Please input a userid and a 6 digits pin");
-      return;
+        res.send("Please input a userid and a 6 digits pin");
+        return;
     }
 
     if (authenticator.checkAuthorized(req.session)) {
@@ -69,10 +70,10 @@ app.post('/authenticate', function(req, res) { //base page
     }
     else {
         if (authenticator.authRequest(req.session, req.body.user, req.body.pin)) {
-          res.send("Authorized. At " + req.session.authorized);
+            res.send("Authorized. At " + req.session.authorized);
         }
         else {
-          res.send("Invalid user and pin combination. try again!");
+            res.send("Invalid user and pin combination. try again!");
         }
     }
 });
@@ -90,48 +91,53 @@ app.post('/authenticate', function(req, res) { //base page
  * To use: send a request to localhost:3000/pay?amount=(amount)&customer=(token)&merchantid=(merchant)
  * Example Request: /pay?amount=300.00&customer=663573599&merchantid=123
  */
-app.get('/pay', function(req, res) { //change to app.post once debug finish
+app.get('/pay', function (req, res) { //change to app.post once debug finish
     var sess = req.session;
     //if (!authenticator.checkAuthorized(sess)) {
     //    res.render(path.join(__dirname + '/Home.html'));
     //    return;
     //}//check auth later
-    if(!req.query.amount || req.query.amount < 0.01 || !req.query.customer || !req.query.merchantid) { //change to req.body if POST
+    if (!req.query.amount || req.query.amount < 0.01 || !req.query.customer || !req.query.merchantid) { //change to req.body if POST
         res.send("<p>Please provide amount, customer and merchantid to pay to</p>");
         return;
-    }    
-    
+    }
+
     var page = path.join(__dirname + '/index.html');
-    customer.openCustomerPayPage(sess,req.query.amount,req.query.customer,req.query.merchantid, res, page); //find customer, if customer not found overwrite but this should not happen
+    var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
+    cpromise.then(function(value) {
+                console.log("test" + value);
+                customer.openCustomerPayPage(sess, req.query.amount, value, req.query.merchantid, res, page); //find customer, if customer not found overwrite but this should not happen
+
+    });
 });
 
-/**
- * processpayment handler, customer.chargeCard for details
- */
-app.post('/processpayment', function(req, res) {
-  if(!req.body.amount || !req.body.nonce || !req.session.customer || !req.body.merchantid) {
-      res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
-      return;
-  }
-  customer.chargeCard(req.body.amount,req.body.nonce,req.session.customer,req.body.merchantid,res);
-});
+    /**
+     * processpayment handler, customer.chargeCard for details
+     */
+    app.post('/processpayment', function (req, res) {
+        if (!req.body.amount || !req.body.nonce || !req.session.customer || !req.body.merchantid) {
+            res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
+            return;
+        }
+        customer.chargeCard(req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res);
+    });
 
-/**
- * create customer handler, customer.createCustomer for details
- */
-app.get("/create/customer", function(req, res) {
-  if(!req.query.clientid) {
-      res.send("<p>Please provide clientid</p>");
-      return;
-  }
-  customer.createCustomer(req.query.clientid,res);
-});
+    /**
+     * create customer handler, customer.createCustomer for details
+     */
+    app.get("/create/customer", function (req, res) {
+        if (!req.query.clientid) {
+            res.send("<p>Please provide clientid</p>");
+            return;
+        }
+        customer.createCustomer(req.query.clientid, res);
+    });
 
-/**
- * handles 404 errors here
- * 
- * note that this has to be the last app.x function
- */
-app.use(function (req, res, next) {
-  res.status(404).send("You may not view this page. Please use localhost:3000/pay")
-});
+    /**
+     * handles 404 errors here
+     * 
+     * note that this has to be the last app.x function
+     */
+    app.use(function (req, res, next) {
+        res.status(404).send("You may not view this page. Please use localhost:3000/pay")
+    });

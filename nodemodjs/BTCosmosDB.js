@@ -129,7 +129,7 @@ function findBTtoken(customerID) {
                 console.log("----------");
                 console.log("Searching Client ID: "+scustmoer_id);
                 console.log("Coresponding BT Token: "+scustomer_BTtoken);
-                resolve(result);
+                resolve(scustomer_BTtoken);
                 
                 }
 
@@ -187,3 +187,4 @@ function deleteDoc(documents) {
 
 module.exports = BTDatabasefunction;
 module.exports.insertNewCustomer = insertNewCustomer;
+module.exports.findBTtoken = findBTtoken;
