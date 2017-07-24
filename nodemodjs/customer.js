@@ -40,7 +40,7 @@ function chargeCard (amount,nonce,customertoken,merchantid,res) {
                 res.send("Payment of $" + amount + " has been made successfully. Payment is charged to card **** "+last4digit+" Thank you!");
                 //TODO: database stuff
                 //database.addTransaction(customerid, merchantid, amountpaid, receiptid(to be exposed)) ***
-                
+                ///send savedaddress
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
@@ -99,6 +99,32 @@ function createCustomer(clientID,res) {
  * 
  * @param {*string} customerToken the customertoken to retrieve card details from
  */
+function openCustomerPayPage(sess,amount,customerToken,merchantid,res,page) {
+    cvars.gateway.customer.find(customerToken, function(err, customer) {
+        if(!err){
+            cvars.gateway.clientToken.generate({customerId: customerToken}, function (err, response) {
+            console.log(response.clientToken);      
+            sess.customer = customerToken;
+            console.log("customer is " + sess.customer);
+            res.render(page,
+            {
+            clientoken : response.clientToken,
+            amount: amount,
+            merchantid: merchantid
+            });
+        });
+    }
+        else {
+            res.send("<p>Customer ID is not found, please try again. Error: " + err.type + " - " + err.message + "</p>");
+
+            //this should not happen, but if customertoken got removed somehow, this will happen
+            //maybe add a new token to this client if this happens
+            console.log(err)
+            
+        };
+});
+}
+
 function openCustomerPayPage(sess,amount,customerToken,merchantid,res,page) {
     cvars.gateway.customer.find(customerToken, function(err, customer) {
         if(!err){
