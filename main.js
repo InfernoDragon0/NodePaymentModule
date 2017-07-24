@@ -133,6 +133,20 @@ app.get('/pay', function (req, res) { //change to app.post once debug finish
         customer.createCustomer(req.query.clientid, res);
     });
 
+    app.get("/find/customer", function (req, res) {
+        if (!req.query.clientid) {
+            res.send("<p>Please provide clientid</p>");
+            return;
+        }
+        var cpromise = BTDatabaseFunction.findBTtoken(req.query.clientid);
+        cpromise.then(function(value) {
+                console.log("test" + value);
+                customer.retrieveCustomerCardDetails(value,res);
+        });
+        
+        
+    });
+
     /**
      * handles 404 errors here
      * 
@@ -141,3 +155,4 @@ app.get('/pay', function (req, res) { //change to app.post once debug finish
     app.use(function (req, res, next) {
         res.status(404).send("You may not view this page. Please use localhost:3000/pay")
     });
+

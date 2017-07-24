@@ -9,7 +9,7 @@ var BTDatabasefunction = require("./BTCosmosDB");
 module.exports.chargeCard = chargeCard;
 module.exports.openCustomerPayPage = openCustomerPayPage;
 module.exports.createCustomer = createCustomer;
-
+module.exports.retrieveCustomerCardDetails=retrieveCustomerCardDetails;
 /**
  * API Description: 
  * This is process payment method for single card charges
@@ -41,6 +41,14 @@ function chargeCard (amount,nonce,customertoken,merchantid,res) {
                 //TODO: database stuff
                 //database.addTransaction(customerid, merchantid, amountpaid, receiptid(to be exposed)) ***
                 ///send savedaddress
+            
+                var transactionDetails = {cardLast4Digit : last4digit , transactionAmount : amount, transactionTimeStamp : Date.now() };
+                console.log ( "test 1 :");
+                console.log(transactionDetails.cardLast4Digit);
+                console.log ( "test 2 :");
+                console.log (transactionDetails.transactionAmount);
+                console.log ( "test 3 :");
+                console.log (transactionDetails.transactionTimeStamp);
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
@@ -150,3 +158,18 @@ function openCustomerPayPage(sess,amount,customerToken,merchantid,res,page) {
 });
 }
 
+
+function retrieveCustomerCardDetails(customerToken,res){
+    cvars.gateway.customer.find(customerToken, function(err, customer) {
+if(!err){
+    // console.log("2: "+ JSON.stringify(customer.paymentMethods));
+    // console.log ("first card"+ customer.paymentMethods.length);
+    var cards = {}
+    for(card in customer.paymentMethods){
+        cards [card] = (customer.paymentMethods[card].last4);
+    }
+    console.log(JSON.stringify(cards));
+    res.send("cards are " + JSON.stringify(cards));
+}
+    });
+};
