@@ -116,8 +116,14 @@ function findBTtoken(customerID) {
         "Select * from root r where r.customer_id='"+customerID+"'").toArray((err, results)=>{
             if (err) {
                 console.log(JSON.stringify(err));
+                resolve('-1');
             }
             else{
+                if (results.length < 1) {
+                    console.log("No data found");
+                    resolve('-1');
+                    return;
+                }
                 for (let result of results) {
                     // console.log(JSON.stringify(result));
                 //                     console.log("----------");

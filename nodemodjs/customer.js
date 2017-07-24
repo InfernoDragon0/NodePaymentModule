@@ -36,7 +36,8 @@ function chargeCard (amount,nonce,customertoken,merchantid,res) {
     }, function (err, result) { //we can send the whole RESULT so that the bot can manually use the json data
         if(!err){
             if (result.success) {
-                res.send("Payment of $" + amount + " has been made successfully. Thank you!");
+                var last4digit = result.transaction.creditCard.last4;
+                res.send("Payment of $" + amount + " has been made successfully. Payment is charged to card **** "+last4digit+" Thank you!");
                 //TODO: database stuff
                 //database.addTransaction(customerid, merchantid, amountpaid, receiptid(to be exposed)) ***
                 
