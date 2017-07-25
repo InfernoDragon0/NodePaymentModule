@@ -6,7 +6,7 @@
  */
 const cvars = require("./commonvariables.js");
 var BTDatabasefunction = require("./BTCosmosDB");
-var queuePayfunction = require("./queuePayDetails");
+var queue2PayDetails = require("./queue2PayDetails");
 module.exports.chargeCard = chargeCard;
 module.exports.openCustomerPay = openCustomerPay;
 module.exports.createCustomer = createCustomer;
@@ -45,14 +45,14 @@ function chargeCard (amount,nonce,customertoken,merchantid,res,storageAddress) {
                 ///send savedaddress
             
                 var transactionDetails = {cardLast4Digit : last4digit , transactionAmount : amount, transactionTimeStamp : Date.now() };
-                console.log ( "test 1 :");
-                console.log(transactionDetails.cardLast4Digit);
-                console.log ( "test 2 :");
-                console.log (transactionDetails.transactionAmount);
-                console.log ( "test 3 :");
-                console.log (transactionDetails.transactionTimeStamp);
-                // address need to be inputed to work
-                queuePayfunction.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
+                // console.log ( "test 1 :");
+                // console.log(transactionDetails.cardLast4Digit);
+                // console.log ( "test 2 :");
+                // console.log (transactionDetails.transactionAmount);
+                // console.log ( "test 3 :");
+                // console.log (transactionDetails.transactionTimeStamp);
+                // // address need to be inputed to work
+                queue2PayDetails.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
