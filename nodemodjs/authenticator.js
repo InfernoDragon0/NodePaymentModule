@@ -9,6 +9,7 @@ var encryption = 'sha256';
 
 module.exports.checkAuthorized = checkAuthorized;
 module.exports.authRequest = authRequest;
+module.exports.genRandomizedLink = genRandomizedLink;
 
 function checkAuthorized(session) { //doesnt do anything yet cos no session stuff added
     var timenow = Math.floor(Date.now() / 1000);
@@ -35,4 +36,22 @@ function authRequest(sess, user, pin) {
     else {
         return false;
     }
+}
+
+function genRandomizedLink(proc1,proc2,proc3,proc4) {
+    var hash1 = crypto.createHash('sha256').update(proc1 + proc2).digest('base64');
+    var hash2 = crypto.createHash('sha256').update(proc3 + proc4).digest('base64');
+    var chars = hash1 + Date.now + hash2;
+
+    var a = chars.split(""),
+        len = a.length;
+
+    for(var i = len - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
+    }
+    var randomed = crypto.createHash('sha256').update(a.join("")).digest('base64');
+    return encodeURIComponent(randomed.substr(0, randomed.length - 1));
 }

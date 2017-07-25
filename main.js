@@ -102,11 +102,35 @@ app.get('/pay', function (req, res) { //change to app.post once debug finish
         return;
     }
     var page = path.join(__dirname + '/index.html');
-    var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
-    cpromise.then(function(value) {
-                customer.openCustomerPay(sess, req.query.amount, value, req.query.merchantid, res, page, req.query.savedAddress); //find customer, if customer not found overwrite but this should not happen
+    var randHash = authenticator.genRandomizedLink(req.query.amount, req.query.customer, req.query.merchantid, req.query.savedAddress);
+    res.send(randHash);
+    //var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
+    //cpromise.then(function(value) {
+     //           customer.openCustomerPay(sess, req.query.amount, value, req.query.merchantid, res, page, req.query.savedAddress); //find customer, if customer not found overwrite but this should not happen
 
-    });
+//    });
+});
+
+app.get('/payhash', function (req, res) { //TEST FUNCTION FOR HASH
+    var sess = req.session;
+    //if (!authenticator.checkAuthorized(sess)) {
+    //    res.render(path.join(__dirname + '/Home.html'));
+    //    return;
+    //}//check auth later
+    if (!req.query.hash) { //change to req.body if POST
+        res.send("<p>Please provide a valid hash</p>");
+        return;
+    }
+    var page = path.join(__dirname + '/index.html');
+    //var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
+    //database.searchPayment(req.query.hash);
+    var amount = "100" //result[amount]
+    var merchant = "123" //result[merchant]
+    var customertoken = "663573599" //result[customertoken]
+    var savedAddress = "somerandomsavedaddress" //result[savedaddress]
+    
+    customer.openCustomerPay(sess, amount, customertoken, merchant, res, page, savedAddress); //find customer, if customer not found overwrite but this should not happen
+
 });
 
 app.post('/pay', function (req, res) {
@@ -122,7 +146,9 @@ app.post('/pay', function (req, res) {
     var page = path.join(__dirname + '/index.html');
     var cpromise = BTDatabaseFunction.findBTtoken(req.body.customer);
     cpromise.then(function(value) {
-                customer.openCustomerPay(sess, req.body.amount, value, req.body.merchantid, res, page, req.body.savedAddress); //find customer, if customer not found overwrite but this should not happen
+                var randHash = authenticator.genRandomizedLink(req.body.amount, req.body.customer, req.body.merchantid, req.body.savedAddress);
+                res.send(randHash);
+                //customer.openCustomerPay(sess, req.body.amount, value, req.body.merchantid, res, page, req.body.savedAddress); //find customer, if customer not found overwrite but this should not happen
 
     });
 });
