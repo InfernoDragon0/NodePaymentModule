@@ -1,119 +1,89 @@
-const storageAzure = require('azure-storage')
-// const retryOperations = new azure.ExponentialRetryPolicyFilter();
-// const tblSvc = azure.createTableService(config.tblAccountName, config.tblAccessKey1).withFilter(retryOperations);
-
+const azure = require('azure-storage')
+// connection to queue 1
 let AzureWebJobsStorage = 'DefaultEndpointsProtocol=https;AccountName=calebqueue1hashcreation;AccountKey=fNArUQy/Z3uvwhPUefMeYes/bv/FkuckFlJ40xzBxS8CfaBdUBJHQa8F7S0vsHmVPHqpqzCWDtpj15bx1kIhSA==;EndpointSuffix=core.windows.net'
 
 module.exports.sendBotTransactionDetailsToTable = sendBotTransactionDetailsToTable;
+module.exports.searchQueue1Storage=searchQueue1Storage;
+
 
 var retryOperations = new azure.ExponentialRetryPolicyFilter();
-var tableSvc = azure.createTableService().withFilter(retryOperations);
 var entGen = azure.TableUtilities.entityGenerator;
 
-function sendBotTransactionDetailsToTable(storageAddress, bottransactionDetails, genHash){
+function sendBotTransactionDetailsToTable(genHash,address,payment,merchantID,clientID){
 var tDetails = {
                 PartitionKey: entGen.String('transactionDetail4Hash'),
+                //rowkey in the future will be hash, in order to avoid colision
                 RowKey: entGen.String('1'),
-                description: entGen.String(bottransactionDetails),
-                hashAssociated: entGen.String(genHash)
+                hashAssociated: entGen.String(genHash),
+                savedAddress:entGen.String(address),
+                payment:entGen.String(payment),
+                merchantId:entGen.String(merchantID),
+                clientId:entGen.String(clientID)
+                
             }
-var tableName ='b2sTransactionDetails';
-tableSvc.insertEntity(tableName,tDetails, function (error, result, response) {
+let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
+tableSvc.createTableIfNotExists('b2sTransactionDetails', function(error, result, response){
   if(!error){
-    console.log("Entity insertion Succesful!");
-    console.log("-----");
-    consoloe.log ("Table : "+ tableName);
-    console.log("Associated Hash :" + hashAssociated);
-    console.log("Entity inserted: " +description);
-        console.log("-----");
-        console.log("test");
-        console.log("-----");
-        console.log(result);
-        console.log("-----");
-        console.log(response);
+      let tDetailsBuffer = new Buffer(JSON.stringify(tDetails)).toString('base64');
+      tableSvc.insertEntity('b2sTransactionDetails',tDetails, function (error, result, response) {
+        if(!error){
+            console.log("Entity insertion Succesful!");
+            console.log("-----");
+            // console.log ("Table : "+ tableName);
+            // console.log("Associated Hash :" + hashAssociated);
+            console.log("Entity inserted: " +tDetails);
+                console.log("-----");
+                console.log("test");
+                console.log("-----");
+                console.log(result);
+                console.log("-----");
+                console.log(response);
+        }
+        else{
+            console.log(error);
+        }
+            });
+    // Table exists or created
   }
   else{
       console.log(error);
   }
 });
-    };
 
 
+};
 
+//sendBotTransactionDetailsToTable("genhash1","address1","payment1","merchantID-1","clientID-1");
 
+function searchQueue1Storage(hash){
+let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
+tableSvc.retrieveEntity('b2sTransactionDetails', 'transactionDetail4Hash',hash, function(error, result, response){
+  if(!error){
+    // result contains the entity
+    console.log (result);
+    var testDescription = result.description;
+    // var test11=result.description.test1;
+    console.log ("test Description :" + JSON.stringify(testDescription));
+    // console.log ("test11 :" + JSON.stringify(test11));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let queueMessage = { address: storageAddress, type: 'PAY_SUCCESS', text: transactionDetails };
-
-let queueSvc = storageAzure.createQueueService(AzureWebJobsStorage);
-queueSvc.createQueueIfNotExists('payqueue', function(err, result, response){
-    if(!err){
-        let queueMessageBuffer = new Buffer(JSON.stringify(queueMessage)).toString('base64');
-        queueSvc.createMessage('payqueue', queueMessageBuffer, function(err, result, response){
-            if(!err){
-                // success here
-            } else {
-                console.log("Error sending queue");
-                console.log ("details =" + JSON.stringify(queueMessage));
-                // error adding message to queue
-            }
-        });
-    } else {
-        // error creating queue
-        console.log("Error creating queue");
-                console.log (JSON.stringify(err));
-    }
+  }
 });
 };
 
-function sendPayDetailsToQueueFailure(storageAddress, transactionDetails){
-let queueMessage = { address: storageAddress, type: 'PAY_FAILURE', text: transactionDetails };
+//searchQueue1Storage('1');
 
-let queueSvc = storageAzure.createQueueService(AzureWebJobsStorage);
-queueSvc.createQueueIfNotExists('payqueue', function(err, result, response){
-    if(!err){
-        let queueMessageBuffer = new Buffer(JSON.stringify(queueMessage)).toString('base64');
-        queueSvc.createMessage('payqueue', queueMessageBuffer, function(err, result, response){
-            if(!err){
-                // success here
-            } else {
-                console.log("Error sending queue");
-                console.log ("details =" + JSON.stringify(queueMessage));
-                // error adding message to queue
-            }
-        });
-    } else {
-        // error creating queue
-        console.log("Error creating queue");
-                console.log (JSON.stringify(err));
-    }
+function deleEntityFromQueue1(hash){
+var task = {
+  PartitionKey: {'_':'transactionDetail4Hash'},
+  RowKey: {'_': hash}
+};
+let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
+tableSvc.deleteEntity('b2sTransactionDetails', task, function(error, response){
+  if(!error) {
+      console.log("entity sucessfully deleted!");;
+    // Entity deleted
+  }
 });
 };
 
+//deleEntityFromQueue1("1");
