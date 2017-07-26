@@ -14,6 +14,7 @@ var bodyParser = require('body-parser'); //parse POST data
 var session = require('express-session'); //temporary to store sensitive data, see if theres better way
 var authenticator = require("./nodemodjs/authenticator.js");
 var BTDatabaseFunction = require("./nodemodjs/BTCosmosDB");
+var queue1Function = require("./nodemodjs/queue1HashCreation");
 const cvars = require("./nodemodjs/commonvariables.js");
 
 const express = require('express'); //express is good
@@ -104,6 +105,9 @@ app.get('/pay', function (req, res) { //change to app.post once debug finish
     var page = path.join(__dirname + '/index.html');
     var randHash = authenticator.genRandomizedLink(req.query.amount, req.query.customer, req.query.merchantid, req.query.savedAddress);
     res.send(randHash);
+    queue1Function.sendBotTransactionDetailsToTable(randHash,req.query.savedAddress,req.query.amount,req.query.merchantid,req.query.customer);
+    //hash is the primary key*
+
     //var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
     //cpromise.then(function(value) {
      //           customer.openCustomerPay(sess, req.query.amount, value, req.query.merchantid, res, page, req.query.savedAddress); //find customer, if customer not found overwrite but this should not happen

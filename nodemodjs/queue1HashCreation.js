@@ -13,10 +13,10 @@ function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID,
     var tDetails = {
         PartitionKey: entGen.String('transactionDetail4Hash'),
         //rowkey in the future will be hash, in order to avoid colision
-        RowKey: entGen.String('1'),
+        RowKey: entGen.String(genHash),
         hashAssociated: entGen.String(genHash),
         savedAddress: entGen.String(address),
-        payment: entGen.String(payment),
+        paymentAmt: entGen.String(payment),
         merchantId: entGen.String(merchantID),
         clientId: entGen.String(clientID)
 
@@ -30,14 +30,14 @@ function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID,
                     console.log("Entity insertion Succesful!");
                     console.log("-----");
                     // console.log ("Table : "+ tableName);
-                    // console.log("Associated Hash :" + hashAssociated);
+                    // console.log("Associated Hash/RowKey :" + RowKey);
                     console.log("Entity inserted: " + tDetails);
-                    console.log("-----");
-                    console.log("test");
-                    console.log("-----");
-                    console.log(result);
-                    console.log("-----");
-                    console.log(response);
+                    // console.log("-----");
+                    // console.log("test");
+                    // console.log("-----");
+                    // console.log(result);
+                    // console.log("-----");
+                    // console.log(response);
                 }
                 else {
                     console.log(error);
@@ -60,12 +60,22 @@ function searchQueue1Storage(hash) {
     tableSvc.retrieveEntity('b2sTransactionDetails', 'transactionDetail4Hash', hash, function (error, result, response) {
         if (!error) {
             // result contains the entity
+            console.log("Search Result");
             console.log(result);
+            var q2payment= JSON.stringify(result.paymentAmt);
+            var q2merchant=JSON.stringify(result.merchantId);
+            var q2clientid=JSON.stringify(result.clientId);
+            var q2savedAddress=JSON.stringify(result.savedAddress);
+
+            console.log ("Test Payment : "+ q2payment);
+            console.log ("Test Payment : "+ JSON.stringify(q2payment['_']));
         }
         // if err
         else{
             console.log("error has occured");
             console.log(error);
+            // console.log("Error: Entity not found");
+            // console.log("Hash Token: "+hash);
             if(result==null){
                 console.log("Error: Entity not found");
                 console.log("Hash Token: "+hash);
@@ -74,7 +84,7 @@ function searchQueue1Storage(hash) {
     });
 };
 
-searchQueue1Storage('1');
+searchQueue1Storage('1Vtsr1Lyu4DzFA7tInVGKmLHFWNpIJO9aj4B%2FuMv87M');
 
 function deleEntityFromQueue1(hash) {
     var task = {
