@@ -168,12 +168,13 @@ app.post('/processpayment', function (req, res) {
 });
 
 app.post('/autopayment', function (req, res) {
-    if (!req.body.amount || !req.session.customer || !req.body.merchantid) {
-        res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
+    if (!req.body.amount || !req.body.customer || !req.body.merchantid) {
+        res.send("<p>Please provide amount, customer token and merchantid</p>");
         return;
     }
+    //swap customer for clientid
     var storageAddress = req.session.storageAddress;
-    customer.autoChargeCard(req.body.amount, req.session.customer, req.body.merchantid, res, storageAddress);
+    customer.autoChargeCard(req.body.amount, req.body.customer, req.body.merchantid, res, storageAddress);
 });
 
 /**

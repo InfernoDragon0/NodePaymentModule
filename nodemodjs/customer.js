@@ -63,7 +63,6 @@ function autoChargeCard (amount,customertoken,merchantid,res,storageAddress) {
         amount: amount,
         customerId: customertoken, //uses default payment method
         options: {
-            storeInVaultOnSuccess: true, //store the card with this customer on successful payment
             submitForSettlement: true //must submit for settlement to process payment, can set to false to settle later within 7 days
         }
     }, function (err, result) { //we can send the whole RESULT so that the bot can manually use the json data
@@ -71,9 +70,10 @@ function autoChargeCard (amount,customertoken,merchantid,res,storageAddress) {
             if (result.success) {
                 var last4digit = result.transaction.creditCard.last4;
                 res.send("Payment of $" + amount + " has been made successfully. Payment is charged to card **** "+last4digit+" Thank you!");
-            
-                var transactionDetails = {cardLast4Digit : last4digit , transactionAmount : amount, transactionTimeStamp : Date.now() };
-                queue2PayDetails.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
+                //TODO add payment transaction history to database
+
+                //var transactionDetails = {cardLast4Digit : last4digit , transactionAmount : amount, transactionTimeStamp : Date.now() };
+                //queue2PayDetails.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
