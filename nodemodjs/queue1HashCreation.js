@@ -62,14 +62,13 @@ function searchQueue1Storage(hash) {
             // result contains the entity
             console.log("Search Result");
             console.log(result);
-            var q2payment= JSON.stringify(result.paymentAmt);
-            var q2merchant=JSON.stringify(result.merchantId);
-            var q2clientid=JSON.stringify(result.clientId);
-            var q2savedAddress=JSON.stringify(result.savedAddress);
+            return(result);
+            var q2payment= JSON.stringify(result.paymentAmt._);
+            var q2merchant=JSON.stringify(result.merchantId._);
+            var q2clientid=JSON.stringify(result.clientId._);
+            var q2savedAddress=JSON.stringify(result.savedAddress._);
 
-            console.log ("Test Payment : "+ q2payment);
-            console.log ("Test Payment : "+ JSON.stringify(q2payment['_']));
-        }
+            console.log ("Test Payment : "+ q2payment );        }
         // if err
         else{
             console.log("error has occured");
@@ -84,7 +83,7 @@ function searchQueue1Storage(hash) {
     });
 };
 
-searchQueue1Storage('1Vtsr1Lyu4DzFA7tInVGKmLHFWNpIJO9aj4B%2FuMv87M');
+searchQueue1Storage('4RcCxvvro7bj23xv6kr%2FX%2BIDSt3KF5qtNjjUPxJ4WB0');
 
 function deleEntityFromQueue1(hash) {
     var task = {
