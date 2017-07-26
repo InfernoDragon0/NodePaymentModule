@@ -129,7 +129,7 @@ app.get('/payhash', function (req, res) { //TEST FUNCTION FOR HASH
     var page = path.join(__dirname + '/index.html');
     //var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
     //database.searchPayment(req.query.hash);
-    queue1Function.searchQueue1Storage(hash, res, sess,page);
+    queue1Function.searchQueue1Storage(hash, res,sess,page);
     // customer.openCustomerPay(sess, amount, customertoken, merchant, res, page, savedAddress); //find customer, if customer not found overwrite but this should not happen
 
 });
@@ -150,54 +150,63 @@ app.post('/pay', function (req, res) {
     res.send(randHash);
     queue1Function.sendBotTransactionDetailsToTable(randHash,req.body.savedAddress,req.body.amount,req.body.merchantid,req.body.customer);
 
-                //customer.openCustomerPay(sess, req.body.amount, value, req.body.merchantid, res, page, req.body.savedAddress); //find customer, if customer not found overwrite but this should not happen
+    //customer.openCustomerPay(sess, req.body.amount, value, req.body.merchantid, res, page, req.body.savedAddress); //find customer, if customer not found overwrite but this should not happen
 
 
 });
-    /**
-     * processpayment handler, customer.chargeCard for details
-     */
-    app.post('/processpayment', function (req, res) {
-        if (!req.body.amount || !req.body.nonce || !req.session.customer || !req.body.merchantid) {
-            res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
-            return;
-        }
-        var storageAddress = req.session.storageAddress;
-        console.log("storeaddress is " + storageAddress);
-        customer.chargeCard(req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res, storageAddress);
-    });
+/**
+ * processpayment handler, customer.chargeCard for details
+ */
+app.post('/processpayment', function (req, res) {
+    if (!req.body.amount || !req.body.nonce || !req.session.customer || !req.body.merchantid) {
+        res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
+        return;
+    }
+    var storageAddress = req.session.storageAddress;
+    console.log("storeaddress is " + storageAddress);
+    customer.chargeCard(req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res, storageAddress);
+});
 
-    /**
-     * create customer handler, customer.createCustomer for details
-     */
-    app.get("/create/customer", function (req, res) {
-        if (!req.query.clientid) {
-            res.send("<p>Please provide clientid</p>");
-            return;
-        }
-        customer.createCustomer(req.query.clientid, res);
-    });
+app.post('/autopayment', function (req, res) {
+    if (!req.body.amount || !req.session.customer || !req.body.merchantid) {
+        res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
+        return;
+    }
+    var storageAddress = req.session.storageAddress;
+    customer.autoChargeCard(req.body.amount, req.session.customer, req.body.merchantid, res, storageAddress);
+});
 
-    app.get("/find/customer", function (req, res) {
-        if (!req.query.clientid) {
-            res.send("<p>Please provide clientid</p>");
-            return;
-        }
-        var cpromise = BTDatabaseFunction.findBTtoken(req.query.clientid);
-        cpromise.then(function(value) {
-                console.log("test" + value);
-                customer.retrieveCustomerCardDetails(value,res);
-        });
-        
-        
-    });
+/**
+ * create customer handler, customer.createCustomer for details
+ */
+app.get("/create/customer", function (req, res) {
+    if (!req.query.clientid) {
+        res.send("<p>Please provide clientid</p>");
+        return;
+    }
+    customer.createCustomer(req.query.clientid, res);
+});
 
-    /**
-     * handles 404 errors here
-     * 
-     * note that this has to be the last app.x function
-     */
-    app.use(function (req, res, next) {
-        res.status(404).send("You may not view this page. Please use localhost:3000/pay")
+app.get("/find/customer", function (req, res) {
+    if (!req.query.clientid) {
+        res.send("<p>Please provide clientid</p>");
+        return;
+    }
+    var cpromise = BTDatabaseFunction.findBTtoken(req.query.clientid);
+    cpromise.then(function(value) {
+            console.log("test" + value);
+            customer.retrieveCustomerCardDetails(value,res);
     });
+    
+    
+});
+
+/**
+ * handles 404 errors here
+ * 
+ * note that this has to be the last app.x function
+ */
+app.use(function (req, res, next) {
+    res.status(404).send("You may not view this page. Please use localhost:3000/pay")
+});
 
