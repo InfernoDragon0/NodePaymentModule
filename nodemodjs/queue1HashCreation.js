@@ -20,7 +20,8 @@ function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID,
         savedAddress: entGen.String(address),
         paymentAmt: entGen.String(payment),
         merchantId: entGen.String(merchantID),
-        clientId: entGen.String(clientID)
+        clientId: entGen.String(clientID),
+        timeStamp1: entGen.String(Date.now())
 
     }
     let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
@@ -68,12 +69,35 @@ function searchQueue1Storage(hash,res,sess,page) {
             var q2merchant=result.merchantId._;
             var q2clientid=result.clientId._;
             var q2savedAddress=result.savedAddress._;
-
+            var TimeoutTimer =result.timeStamp1._+120000;
+            var timeNow = Date.now();
+            // console.log("result time test :" +testTime);
+            // console.log("Date.now :" +Date.now());
+            // console.log("Date.now :" +Date.now());
+            // console.log("Date.now :" +Date.now());
+            // console.log("Date.now :" +Date.now());
+            // console.log("Date.now :" +Date.now());console.log("Date.now :" +Date.now());
+            // console.log("Date.now :" +Date.now());
+            // console.log("Date.now :" +Date.now());
+            // console.log("Time.now :" +Time.now());
+            if(timeNow<TimeoutTimer){
             var cpromise = BTDatabaseFunction.findBTtoken(q2clientid);
             cpromise.then(function(customertoken) {
                 customer.openCustomerPay(sess, q2payment, customertoken, q2merchant, res, page, q2savedAddress); //find customer, if customer not found overwrite but this should not happen
+               
                 console.log("vars are " + customertoken + " q2payment " + q2payment + " q2merchant " + q2merchant + "q2address " + q2savedAddress);
-            }); 
+        console.log(TimeoutTimer);
+            console.log(result.timeStamp1._ );
+            console.log(Date.now());     
+        }); 
+        }else{
+            console.log(" HASH TIMED OUT ");  
+            console.log(TimeoutTimer);
+            console.log(result.timeStamp1._ )
+            console.log(Date.now()); 
+            console.log(Date.now(1000));
+             }
+        
         }
         else{
             console.log("error has occured");
@@ -88,7 +112,7 @@ function searchQueue1Storage(hash,res,sess,page) {
     });
 };
 
-//searchQueue1Storage('4RcCxvvro7bj23xv6kr%2FX%2BIDSt3KF5qtNjjUPxJ4WB0');
+// searchQueue1Storage('83kUh4HmuS3d%2FZaawqdQzWEtP0Ufgw3kQLNMdnQlipc',"1",'1','1');
 
 function deleEntityFromQueue1(hash) {
     var task = {
