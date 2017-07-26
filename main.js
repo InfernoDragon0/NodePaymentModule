@@ -149,6 +149,8 @@ app.post('/pay', function (req, res) {
     cpromise.then(function(value) {
                 var randHash = authenticator.genRandomizedLink(req.body.amount, req.body.customer, req.body.merchantid, req.body.savedAddress);
                 res.send(randHash);
+                queue1Function.sendBotTransactionDetailsToTable(randHash,req.body.savedAddress,req.body.amount,req.body.merchantid,req.body.customer);
+
                 //customer.openCustomerPay(sess, req.body.amount, value, req.body.merchantid, res, page, req.body.savedAddress); //find customer, if customer not found overwrite but this should not happen
 
     });
