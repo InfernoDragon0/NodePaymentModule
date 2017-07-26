@@ -125,20 +125,12 @@ app.get('/payhash', function (req, res) { //TEST FUNCTION FOR HASH
         res.send("<p>Please provide a valid hash</p>");
         return;
     }
+    var hash = encodeURIComponent(req.query.hash);
     var page = path.join(__dirname + '/index.html');
     //var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
     //database.searchPayment(req.query.hash);
-    var amount = "100" //result[amount]
-    var merchant = "123" //result[merchant]
-    var customertoken = "663573599" //result[customertoken]
-    var savedAddress = "somerandomsavedaddress" //result[savedaddress]
-    var resultFromStorage = queue1Function.searchQueue1Storage(req.query.hash);
-    var q2payment= JSON.stringify(resultFromStorage.paymentAmt._);
-    var q2merchant=JSON.stringify(resultFromStorage.merchantId._);
-    var q2clientid=JSON.stringify(resultFromStorage.clientId._);
-    var q2savedAddress=JSON.stringify(resultFromStorage.savedAddress._);
+    queue1Function.searchQueue1Storage(hash, res, sess,page);
     // customer.openCustomerPay(sess, amount, customertoken, merchant, res, page, savedAddress); //find customer, if customer not found overwrite but this should not happen
-    customer.openCustomerPay(sess, q2payment, customertoken, q2merchant, res, page, q2savedAddress); //find customer, if customer not found overwrite but this should not happen
 
 });
 
