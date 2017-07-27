@@ -69,7 +69,7 @@ function searchQueue1Storage(hash,res,sess,page) {
             var q2merchant=result.merchantId._;
             var q2clientid=result.clientId._;
             var q2savedAddress=result.savedAddress._;
-            var TimeoutTimer =result.timeStamp1._+120000;
+            var TimeoutTimer =result.timeStamp1._+300000; // 5minutes
             var timeNow = Date.now();
             // console.log("result time test :" +testTime);
             // console.log("Date.now :" +Date.now());
