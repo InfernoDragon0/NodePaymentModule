@@ -13,7 +13,7 @@ var retryOperations = new azure.ExponentialRetryPolicyFilter();
 var entGen = azure.TableUtilities.entityGenerator;
 
 function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID, clientID) {
-    var timeStamp1=entGen.String(Date.now())
+    var timeStamp1=entGen.Int64(Date.now())
     var tDetails = {
         PartitionKey: entGen.String('transactionUriHash'),
         //rowkey in the future will be hash, in order to avoid colision
