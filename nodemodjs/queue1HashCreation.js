@@ -1,6 +1,7 @@
 const azure = require('azure-storage')
 const customer = require('./customer.js');
 var BTDatabaseFunction = require("./BTCosmosDB");
+var deletingQueue = require('./queue1DeletingQueue');
 // connection to queue 1
 let AzureWebJobsStorage = 'DefaultEndpointsProtocol=https;AccountName=calebqueue1hashcreation;AccountKey=fNArUQy/Z3uvwhPUefMeYes/bv/FkuckFlJ40xzBxS8CfaBdUBJHQa8F7S0vsHmVPHqpqzCWDtpj15bx1kIhSA==;EndpointSuffix=core.windows.net'
 
@@ -12,6 +13,7 @@ var retryOperations = new azure.ExponentialRetryPolicyFilter();
 var entGen = azure.TableUtilities.entityGenerator;
 
 function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID, clientID) {
+    var timeStamp1=entGen.String(Date.now())
     var tDetails = {
         PartitionKey: entGen.String('transactionDetail4Hash'),
         //rowkey in the future will be hash, in order to avoid colision
@@ -21,9 +23,9 @@ function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID,
         paymentAmt: entGen.String(payment),
         merchantId: entGen.String(merchantID),
         clientId: entGen.String(clientID),
-        timeStamp1: entGen.String(Date.now())
-
+        timeStamp2: timeStamp1
     }
+    deletingQueue.deleteQueue(genHash,timeStamp1);
     let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
     tableSvc.createTableIfNotExists('b2sTransactionDetails', function (error, result, response) {
         if (!error) {
@@ -71,15 +73,7 @@ function searchQueue1Storage(hash,res,sess,page) {
             var q2savedAddress=result.savedAddress._;
             var TimeoutTimer =result.timeStamp1._+300000; // 5minutes
             var timeNow = Date.now();
-            // console.log("result time test :" +testTime);
-            // console.log("Date.now :" +Date.now());
-            // console.log("Date.now :" +Date.now());
-            // console.log("Date.now :" +Date.now());
-            // console.log("Date.now :" +Date.now());
-            // console.log("Date.now :" +Date.now());console.log("Date.now :" +Date.now());
-            // console.log("Date.now :" +Date.now());
-            // console.log("Date.now :" +Date.now());
-            // console.log("Time.now :" +Time.now());
+
             if(timeNow<TimeoutTimer){
             var cpromise = BTDatabaseFunction.findBTtoken(q2clientid);
             cpromise.then(function(customertoken) {
