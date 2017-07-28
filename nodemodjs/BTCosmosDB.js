@@ -1,14 +1,16 @@
-var cosmosConfig = require("./BTCosmosconfig");
-var docdbClient = require("documentdb").DocumentClient;
-var BTDatabasefunction = {};
+const cosmosConfig = require("./BTCosmosconfig");
+const docdbClient = require("documentdb").DocumentClient;
 
-var client = new docdbClient(cosmosConfig.endpoint,{masterKey: cosmosConfig.primaryKey});
+const client = new docdbClient(cosmosConfig.endpoint,{masterKey: cosmosConfig.primaryKey});
 
-var HttpStatusCodes = { NOTFOUND: 404 }
+const HttpStatusCodes = { NOTFOUND: 404 }
 
 
-var databaseUrl =`dbs/${cosmosConfig.database.id}`;
-var collectionUrl = `${databaseUrl}/colls/${cosmosConfig.collection.id}`;
+const databaseUrl =`dbs/${cosmosConfig.database.id}`;
+const collectionUrl = `${databaseUrl}/colls/${cosmosConfig.collection.id}`;
+
+module.exports.insertNewCustomer = insertNewCustomer;
+module.exports.findBTtoken = findBTtoken;
 
 function createDbIfNotExists(){
     client.readDatabase(databaseUrl, (err, result) => {
@@ -28,7 +30,6 @@ function createDbIfNotExists(){
         }
     });
 };
-//createDbIfNotExists();
 
 function createCollectionIfNotExists(){
     client.readCollection(collectionUrl, (err, result) => {
@@ -48,8 +49,6 @@ function createCollectionIfNotExists(){
         }
     });
 };
-//createCollectionIfNotExists();
-
 
 // insert documents, edit documents in the config file
 function getUserDocument(documents) {
@@ -84,6 +83,10 @@ function getUserDocument(documents) {
 //getUserDocument(cosmosConfig.customerBTDetaildocuments);
 
 
+
+
+
+////////////////////////////////////Functions in Use////////////////////////////////////
 // insert new client with new bttoken
 function insertNewCustomerDataInput(data){
 client.createDocument(collectionUrl, data, (err,created)=>{
@@ -96,18 +99,28 @@ client.createDocument(collectionUrl, data, (err,created)=>{
     });
 };
     function insertNewCustomer(newcustomer_id,newBTwalletToken){
-    var new_id = newcustomer_id;
-    // var newcustomer_id = '6';
-    // var newBTwalletToken = 'token1';
+    return new Promise((resolve, reject) =>{
+        client.queryDocuments(collectionUrl,
+        "Select * from root r where r.customer_id='"+newcustomer_id+"'").toArray((err, results)=>{
+            if (err) {
+                console.log(JSON.stringify(err));
+                resolve('-1');
+            }
+            else{
+                if (results.length < 1) {
+                    console.log("No existing customer found");
+                    insertNewCustomerDataInput({'id': newcustomer_id,'customer_id': newcustomer_id,'customer_BTwalletToken':newBTwalletToken});
+                    resolve('-1');
+                    return;
+                }
+                else{
+                    console.log("Customer Exists");
+                }
 
-    insertNewCustomerDataInput({'id': new_id,'customer_id': newcustomer_id,'customer_BTwalletToken':newBTwalletToken});
-}
-// how to use - inserNewClient("enter new customer_id here", "corresponding bt token")
-//insertNewCustomer('17','token 17');
-
-
-
-
+            }
+        });
+    });
+};
 
  // find client token for existing client ID
 function findBTtoken(customerID) {
@@ -125,35 +138,28 @@ function findBTtoken(customerID) {
                     return;
                 }
                 for (let result of results) {
-                    // console.log(JSON.stringify(result));
-                //                     console.log("----------");
-                // console.log(JSON.stringify(result));
                 console.log("----------");
                 var scustmoer_id = result["customer_id"];
-                var scustomer_BTtoken= result["customer_BTwalletToken"]
-               // console.log(result);
+                var scustomer_BTtoken= result["customer_BTwalletToken"];
                 console.log("----------");
                 console.log("Searching Client ID: "+scustmoer_id);
                 console.log("Coresponding BT Token: "+scustomer_BTtoken);
                 resolve(scustomer_BTtoken);
-                
                 }
-
-              //resolve(results);
             }
         });
     });
 };
-// // findBTtoken(<customer_id>)
-//findBTtoken(16);
 
 
+
+
+
+////////////////////////////////////Functions here not in use yet////////////////////////////////////
 //Change BT wallet token
 function replace(documents,token) {
     let documentUrl=`${collectionUrl}/docs/${documents.customer_id}`;
-    console.log (documentUrl);
     documents.id = documents.customer_id;
-    //documents.customer_id = documents.id;
     documents.customer_BTwalletToken = token;
     console.log ("Updated Documents");
     console.log (documents);
@@ -191,6 +197,3 @@ function deleteDoc(documents) {
 //deleteDoc(cosmosConfig.deleteDocuments[0]);
 
 
-module.exports = BTDatabasefunction;
-module.exports.insertNewCustomer = insertNewCustomer;
-module.exports.findBTtoken = findBTtoken;
