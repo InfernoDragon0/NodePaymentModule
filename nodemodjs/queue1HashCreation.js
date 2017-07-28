@@ -15,15 +15,14 @@ var entGen = azure.TableUtilities.entityGenerator;
 function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID, clientID) {
     var timeStamp1=entGen.String(Date.now())
     var tDetails = {
-        PartitionKey: entGen.String('transactionDetail4Hash'),
+        PartitionKey: entGen.String('transactionUriHash'),
         //rowkey in the future will be hash, in order to avoid colision
         RowKey: entGen.String(genHash),
-        hashAssociated: entGen.String(genHash),
-        savedAddress: entGen.String(address),
-        paymentAmt: entGen.String(payment),
+        botAddress: entGen.String(address),
+        paymentAmount: entGen.String(payment),
         merchantId: entGen.String(merchantID),
         clientId: entGen.String(clientID),
-        timeStamp2: timeStamp1
+        unixTimestamp: timeStamp1
     }
     deletingQueue.deleteQueue(genHash,timeStamp1);
     let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);

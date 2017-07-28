@@ -6,7 +6,7 @@ module.exports.deleteQueue = deleteQueue;
 
 
 function deleteQueue(Hash,timeStamp){
-let queueMessage = { PartitionKey: 'transactionDetail4Hash', RowKey: Hash , Timestamp: timeStamp._ };
+let queueMessage = { PartitionKey: 'transactionUriHash', RowKey: Hash ,unixTimestamp: timeStamp._ };
 
 let queueSvc = storageAzure.createQueueService(AzureWebJobsStorage);
 queueSvc.createQueueIfNotExists('transactionqueue', function(err, result, response){
