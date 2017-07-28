@@ -35,7 +35,7 @@ app.use(session({
     /*cookie: { secure: true }*/
 })); //secure needs HTTPS, cookies will not be stored if running from HTTP with this option
 app.use(bodyParser.json()); // supporting POST data
-app.use(bodyParser.urlencoded({ extended: true })); // supportting POST data
+//app.use(bodyParser.urlencoded({ extended: true })); // supportting POST data
 /**
  * evals js/css/img folders for JS/CSS/image files
  */
