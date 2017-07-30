@@ -146,7 +146,7 @@ app.post('/pay', function (req, res) {
     }
     var page = path.join(__dirname + '/index.html');
 
-    var randHash = authenticator.genRandomizedLink(req.body.amount, req.body.customer, req.body.merchantid, req.body.savedaddress);
+    var randHash = authenticator.genRandomizedLink(req.body.amount + "", req.body.customer + "", req.body.merchantid + "", req.body.savedaddress + "");
     res.send(randHash);
     queue1Function.sendBotTransactionDetailsToTable(randHash,req.body.savedaddress,req.body.amount,req.body.merchantid,req.body.customer);
 
