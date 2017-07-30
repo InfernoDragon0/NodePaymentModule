@@ -98,14 +98,14 @@ app.get('/pay', function (req, res) { //change to app.post once debug finish
     //    res.render(path.join(__dirname + '/Home.html'));
     //    return;
     //}//check auth later
-    if (!req.query.amount || req.query.amount < 0.01 || !req.query.customer || !req.query.merchantid || !req.query.savedAddress) { //change to req.body if POST
+    if (!req.query.amount || req.query.amount < 0.01 || !req.query.customer || !req.query.merchantid || !req.query.savedaddress) { //change to req.body if POST
         res.send("<p>Please provide amount, customer and merchantid to pay to</p>");
         return;
     }
     var page = path.join(__dirname + '/index.html');
-    var randHash = authenticator.genRandomizedLink(req.query.amount, req.query.customer, req.query.merchantid, req.query.savedAddress);
+    var randHash = authenticator.genRandomizedLink(req.query.amount, req.query.customer, req.query.merchantid, req.query.savedaddress);
     res.send(randHash);
-    queue1Function.sendBotTransactionDetailsToTable(randHash,req.query.savedAddress,req.query.amount,req.query.merchantid,req.query.customer);
+    queue1Function.sendBotTransactionDetailsToTable(randHash,req.query.savedaddress,req.query.amount,req.query.merchantid,req.query.customer);
     //hash is the primary key*
 
     //var cpromise = BTDatabaseFunction.findBTtoken(req.query.customer);
@@ -140,15 +140,15 @@ app.post('/pay', function (req, res) {
     //    res.render(path.join(__dirname + '/Home.html'));
     //    return;
     //}//check auth later
-    if (!req.body.amount || req.body.amount < 0.01 || !req.body.customer || !req.body.merchantid || !req.body.savedAddress) { //change to req.body if POST
+    if (!req.body.amount || req.body.amount < 0.01 || !req.body.customer || !req.body.merchantid || !req.body.savedaddress) { //change to req.body if POST
         res.send("<p>Please provide amount, customer and merchantid to pay to</p>");
         return;
     }
     var page = path.join(__dirname + '/index.html');
 
-    var randHash = authenticator.genRandomizedLink(req.body.amount, req.body.customer, req.body.merchantid, req.body.savedAddress);
+    var randHash = authenticator.genRandomizedLink(req.body.amount, req.body.customer, req.body.merchantid, req.body.savedaddress);
     res.send(randHash);
-    queue1Function.sendBotTransactionDetailsToTable(randHash,req.body.savedAddress,req.body.amount,req.body.merchantid,req.body.customer);
+    queue1Function.sendBotTransactionDetailsToTable(randHash,req.body.savedaddress,req.body.amount,req.body.merchantid,req.body.customer);
 
     //customer.openCustomerPay(sess, req.body.amount, value, req.body.merchantid, res, page, req.body.savedAddress); //find customer, if customer not found overwrite but this should not happen
 
