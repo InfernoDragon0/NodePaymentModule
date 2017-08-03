@@ -1,17 +1,56 @@
 var cosmosConfig = require("./BTCosmosconfig");
 var docdbClient = require("documentdb").DocumentClient;
-var BTDatabasefunction = {};
 
 var client = new docdbClient(cosmosConfig.endpoint,{masterKey: cosmosConfig.primaryKey});
-
 var HttpStatusCodes = { NOTFOUND: 404 }
-
-
 var databaseUrl =`dbs/${cosmosConfig.database.id}`;
 var collectionUrl = `${databaseUrl}/colls/${cosmosConfig.collection.id}`;
+var collectionUrlcustomerBTDetail = `${databaseUrl}/colls/customerBTDetail`;
+var collectionUrltransactionDetail = `${databaseUrl}/colls/transactionDetail`;
+
+module.exports.insertTransaction = insertTransaction;
+
+
+function addTransaction2db(data){
+client.createDocument(collectionUrltransactionDetail, data, (err,created)=>{
+    if(err){
+     console.log(JSON.stringify(err));                 
+    }
+    else{
+    console.log(JSON.stringify(created));
+    }
+    });
+}
+    function insertTransaction(customer_id,merchant_id,btTransaction_id,datetime,amount,order_id){
+        return new Promise((resolve, reject) =>{
+        client.queryDocuments(collectionUrltransactionDetail,
+        "Select * from c").toArray((err, results)=>{
+            if (err) {
+                console.log(JSON.stringify(err));
+            }
+            else{
+                var id1 = results.length;
+                var id = JSON.stringify(id1+1);
+                var transaction_id =id;
+               addTransaction2db({ 'id': id,
+                        'transaction_id': transaction_id,
+                        'customer_id':customer_id,
+                        'merchant_id':merchant_id,
+                        'btTransaction_id':btTransaction_id,
+                        'datetime':datetime,
+                        'amount':amount,
+                        'order_id': order_id,
+                        'transcation_detail':'Sucessful - Purchase'});
+                        };
+        });
+    });
+    };
+// insertTransaction('2','2','testBT2','testdate','100','testorder');
+
+
 
 function createDbIfNotExists(){
-    client.readDatabase(databaseUrl, (err, result) => {
+    client.readDatabase(databasconfig1eUrl, (err, result) => {
         if(err){
             client.createDatabase(cosmosConfig.database, (err, created) => {
                     if(err){
@@ -54,12 +93,12 @@ function createCollectionIfNotExists(){
 // insert documents, edit documents in the config file
 function getUserDocument(documents) {
     for (let i=0;i< documents.length; i++){
-        let documentUrl=`${collectionUrl}/docs/${documents[i].id}`;
+        let documentUrl=`${collectionUrlcustomerBTDetail}/docs/${documents[i].id}`;
 
         client.readDocument(documentUrl, null, (err,result)=>{
             if(err){
                 if (err.code == HttpStatusCodes.NOTFOUND){
-                    client.createDocument(collectionUrl, documents[i], (err,created)=>{
+                    client.createDocument(collectionUrlcustomerBTDetail, documents[i], (err,created)=>{
                         if(err){
                             console.log(JSON.stringify(err));
                         
@@ -86,7 +125,7 @@ function getUserDocument(documents) {
 
 // insert new client with new bttoken
 function insertNewCustomerDataInput(data){
-client.createDocument(collectionUrl, data, (err,created)=>{
+client.createDocument(collectionUrlcustomerBTDetail, data, (err,created)=>{
     if(err){
      console.log(JSON.stringify(err));                 
     }
@@ -103,16 +142,14 @@ client.createDocument(collectionUrl, data, (err,created)=>{
     insertNewCustomerDataInput({'id': new_id,'customer_id': newcustomer_id,'customer_BTwalletToken':newBTwalletToken});
 }
 // how to use - inserNewClient("enter new customer_id here", "corresponding bt token")
-insertNewCustomer('17','token 17');
-
-
+// insertNewCustomer('17','token 17');
 
 
 
  // find client token for existing client ID
 function findBTtoken(customerID) {
     return new Promise((resolve, reject) =>{
-        client.queryDocuments(collectionUrl,
+        client.queryDocuments(collectionUrlcustomerBTDetail,
         "Select * from root r where r.customer_id='"+customerID+"'").toArray((err, results)=>{
             if (err) {
                 console.log(JSON.stringify(err));
@@ -139,12 +176,12 @@ function findBTtoken(customerID) {
     });
 };
 // // findBTtoken(<customer_id>)
-//findBTtoken(16);
+// findBTtoken(16);
 
 
 //Change BT wallet token
 function replace(documents,token) {
-    let documentUrl=`${collectionUrl}/docs/${documents.customer_id}`;
+    let documentUrl=`${collectionUrlcustomerBTDetail}/docs/${documents.customer_id}`;
     console.log (documentUrl);
     documents.id = documents.customer_id;
     //documents.customer_id = documents.id;

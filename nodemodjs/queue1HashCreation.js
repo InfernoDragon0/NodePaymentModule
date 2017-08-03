@@ -24,6 +24,7 @@ function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID,
         clientId: entGen.String(clientID),
         unixTimestamp: timeStamp1
     }
+    BTDatabaseFunction.insertTransaction(clientID,merchantID,'BTtransactionID',Date(),payment,'OrderID')
     deletingQueue.deleteQueue(genHash,timeStamp1);
     let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
     tableSvc.createTableIfNotExists('b2sTransactionDetails', function (error, result, response) {
