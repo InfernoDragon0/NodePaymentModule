@@ -62,16 +62,16 @@ function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID,
 
 function searchQueue1Storage(hash,res,sess,page) {
     let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
-    tableSvc.retrieveEntity('b2sTransactionDetails', 'transactionDetail4Hash', hash, function (error, result, response) {
+    tableSvc.retrieveEntity('b2sTransactionDetails', 'transactionUriHash', hash, function (error, result, response) {
         if (!error) {
             // result contains the entity
             console.log("Search Result");
             console.log(result);
-            var q2payment= result.paymentAmt._;
+            var q2payment= result.paymentAmount._;
             var q2merchant=result.merchantId._;
             var q2clientid=result.clientId._;
-            var q2savedAddress=result.savedAddress._;
-            var TimeoutTimer =result.timeStamp1._+300000; // 5minutes
+            var q2savedAddress=result.botAddress._;
+            var TimeoutTimer =result.unixTimestamp._+300000; // 5minutes
             var timeNow = Date.now();
 
             if(timeNow<TimeoutTimer){
@@ -81,13 +81,13 @@ function searchQueue1Storage(hash,res,sess,page) {
                
                 console.log("vars are " + customertoken + " q2payment " + q2payment + " q2merchant " + q2merchant + "q2address " + q2savedAddress);
         console.log(TimeoutTimer);
-            console.log(result.timeStamp1._ );
+            console.log(result.unixTimestamp._ );
             console.log(Date.now());     
         }); 
         }else{
             console.log(" HASH TIMED OUT ");  
             console.log(TimeoutTimer);
-            console.log(result.timeStamp1._ )
+            console.log(result.unixTimestamp._ )
             console.log(Date.now()); 
             console.log(Date.now(1000));
              }
@@ -99,14 +99,14 @@ function searchQueue1Storage(hash,res,sess,page) {
             // console.log("Error: Entity not found");
             // console.log("Hash Token: "+hash);
             if(result==null){
-                console.log("Error: Entity not found");
+                console.log("Error: Hash Entity not found");
                 console.log("Hash Token: "+hash);
             }
         };
     });
 };
 
-// searchQueue1Storage('83kUh4HmuS3d%2FZaawqdQzWEtP0Ufgw3kQLNMdnQlipc',"1",'1','1');
+searchQueue1Storage('BwkJmH5VpPO1UIbdlfk6hRRNHJCHU9POzUU17%2B6wyh',"1",'1','1');
 
 function deleEntityFromQueue1(hash) {
     var task = {

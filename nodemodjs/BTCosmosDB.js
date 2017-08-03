@@ -8,9 +8,12 @@ const HttpStatusCodes = { NOTFOUND: 404 }
 
 const databaseUrl =`dbs/${cosmosConfig.database.id}`;
 const collectionUrl = `${databaseUrl}/colls/${cosmosConfig.collection.id}`;
+const collectionUrlcustomerBTDetail = `${databaseUrl}/colls/customerBTDetail`;
+const collectionUrltransactionDetail = `${databaseUrl}/colls/transactionDetail`;
 
 module.exports.insertNewCustomer = insertNewCustomer;
 module.exports.findBTtoken = findBTtoken;
+module.exports.insertTransaction=insertTransaction;
 
 function createDbIfNotExists(){
     client.readDatabase(databaseUrl, (err, result) => {
@@ -32,7 +35,7 @@ function createDbIfNotExists(){
 };
 
 function createCollectionIfNotExists(){
-    client.readCollection(collectionUrl, (err, result) => {
+    client.readCollection(collectionUrlcustomerBTDetail, (err, result) => {
         if(err){
             client.createCollection(databaseUrl, cosmosConfig.collection, null, (err, created) => {
                     if(err){
@@ -100,7 +103,7 @@ client.createDocument(collectionUrl, data, (err,created)=>{
 };
     function insertNewCustomer(newcustomer_id,newBTwalletToken){
     return new Promise((resolve, reject) =>{
-        client.queryDocuments(collectionUrl,
+        client.queryDocuments(collectionUrlcustomerBTDetail,
         "Select * from root r where r.customer_id='"+newcustomer_id+"'").toArray((err, results)=>{
             if (err) {
                 console.log(JSON.stringify(err));
@@ -125,7 +128,7 @@ client.createDocument(collectionUrl, data, (err,created)=>{
  // find client token for existing client ID
 function findBTtoken(customerID) {
     return new Promise((resolve, reject) =>{
-        client.queryDocuments(collectionUrl,
+        client.queryDocuments(collectionUrlcustomerBTDetail,
         "Select * from root r where r.customer_id='"+customerID+"'").toArray((err, results)=>{
             if (err) {
                 console.log(JSON.stringify(err));
@@ -151,7 +154,42 @@ function findBTtoken(customerID) {
     });
 };
 
-
+function addTransaction2db(data) {
+    client.createDocument(collectionUrltransactionDetail, data, (err, created) => {
+        if (err) {
+            console.log(JSON.stringify(err));
+        }
+        else {
+            console.log(JSON.stringify(created));
+        }
+    });
+}
+function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime, amount, order_id) {
+    return new Promise((resolve, reject) => {
+        client.queryDocuments(collectionUrltransactionDetail,
+            "Select * from c").toArray((err, results) => {
+                if (err) {
+                    console.log(JSON.stringify(err));
+                }
+                else {
+                    var id1 = results.length;
+                    var id = JSON.stringify(id1 + 1);
+                    var transaction_id = id;
+                    addTransaction2db({
+                        'id': id,
+                        'transaction_id': transaction_id,
+                        'customer_id': customer_id,
+                        'merchant_id': merchant_id,
+                        'btTransaction_id': btTransaction_id,
+                        'datetime': datetime,
+                        'amount': amount,
+                        'order_id': order_id,
+                        'transcation_detail': 'Sucessful - Purchase'
+                    });
+                };
+            });
+    });
+};
 
 
 
