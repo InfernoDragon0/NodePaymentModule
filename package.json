@@ -14,9 +14,20 @@
   "author": "Shawn Lim, Caleb, Thaddeus, Hou Liang",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.5.0",
     "azure-storage": "^2.2.1",
     "documentdb": "^1.12.0",
     "mongodb": "^2.2.30",
-    "mysql": "^2.13.0"
-  }
+    "mysql": "^2.13.0",
+    "tedious": "^2.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InfernoDragon0/NodePaymentModule.git"
+  },
+  "bugs": {
+    "url": "https://github.com/InfernoDragon0/NodePaymentModule/issues"
+  },
+  "homepage": "https://github.com/InfernoDragon0/NodePaymentModule#readme"
 }
