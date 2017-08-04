@@ -1,10 +1,10 @@
 //please use main.js only for app.x so that it is cleaner
 /**
- * Split the modules into parts, for node sided JS please put in 
+ * Split the modules into parts, for node sided JS please put in
  * nodemodjs and use module.exports to #include functions here
- * 
+ *
  * For client sided JS please put in js folder
- * 
+ *
  * Remember, this is an API so calls should not rely too much on html
  */
 
@@ -16,7 +16,6 @@ var authenticator = require("./nodemodjs/authenticator.js");
 var BTDatabaseFunction = require("./nodemodjs/BTCosmosDB");
 var queue1Function = require("./nodemodjs/queue1HashCreation");
 const cvars = require("./nodemodjs/commonvariables.js");
-
 const express = require('express'); //express is good
 const app = express();
 const customer = require('./nodemodjs/customer.js');
@@ -35,7 +34,7 @@ app.use(session({
     /*cookie: { secure: true }*/
 })); //secure needs HTTPS, cookies will not be stored if running from HTTP with this option
 app.use(bodyParser.json()); // supporting POST data
-//app.use(bodyParser.urlencoded({ extended: true })); // supportting POST data
+app.use(bodyParser.urlencoded({ extended: true })); // supportting POST data
 /**
  * evals js/css/img folders for JS/CSS/image files
  */
@@ -53,11 +52,11 @@ app.get('/', function (req, res) { //base page
 });
 
 /**
-* API Description: 
+* API Description:
  * Authentication for 6 digit pins and users (not connected to database yet)
- * 
+ *
  * user: the clientid to authenticate
- * pin: the pin to check against the clientid 
+ * pin: the pin to check against the clientid
  * test variables are USER : PIN {"1" : "121312", "2" : "131154", "3" : "665544"};
  */
 app.post('/authenticate', function (req, res) { //base page
@@ -83,10 +82,10 @@ app.post('/authenticate', function (req, res) { //base page
 /**
  * on start at localhost:3000/pay?amount=10.00 generate the token
  * Requires Bot to send the query via POST
- * 
- * API Description: 
+ *
+ * API Description:
  * This is the credit card request function
- * 
+ *
  * amount: the amount to pay, 1 = $1.00
  * customer: the token from the customer
  * To use: send a request to localhost:3000/pay?amount=(amount)&customer=(token)&merchantid=(merchant)
@@ -198,16 +197,15 @@ app.get("/find/customer", function (req, res) {
             console.log("test" + value);
             customer.retrieveCustomerCardDetails(value,res);
     });
-    
-    
+
+
 });
 
 /**
  * handles 404 errors here
- * 
+ *
  * note that this has to be the last app.x function
  */
 app.use(function (req, res, next) {
     res.status(404).send("You may not view this page. Please use localhost:3000/pay")
 });
-
