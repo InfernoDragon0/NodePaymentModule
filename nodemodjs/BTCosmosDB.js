@@ -175,8 +175,9 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                     var id1 = results.length;
                     var id = JSON.stringify(id1 + 1);
                     var transaction_id = id;
-                    Console.log("Transaction Sucessful");
-                    Console.log("Transaction ID : "+transaction_id);
+                    console.log('Transaction Recorded');
+                    console.log('Pending Payment - Purchase')
+                    console.log('Transaction ID : '+transaction_id);
                     addTransaction2db({
                         'id': id,
                         'transaction_id': transaction_id,
@@ -186,12 +187,46 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                         'datetime': datetime,
                         'amount': amount,
                         'order_id': order_id,
-                        'transaction_detail': 'Sucessful - Purchase'
+                        'transaction_detail': 'Pending - Purchase'
                     });
                 };
             });
     });
 };
+
+
+    function paymentSucessful(transaction_id) {
+    return new Promise((resolve, reject) =>{
+        client.queryDocuments(collectionUrltransactionDetail,
+        "Select * from c where c.id='"+transaction_id+"'").toArray((err, results)=>{
+            if (err) {
+                console.log(JSON.stringify(err));
+                resolve('-1');
+            }
+                    else {
+                        if (results.length < 1) {
+                            console.log('No data found');
+                            resolve('-1');
+                            return;
+                        }
+                        for (let result of results) {
+                            console.log("ihi");
+                            result.transaction_detail = "Sucessful - Purchase"
+                            let documentUrl = `${collectionUrltransactionDetail}/docs/${transaction_id}`;
+                            client.replaceDocument(documentUrl, result, (err, result) => {
+                                if (err) {
+                                    console.log(JSON.stringify(err));
+                                }
+                                else {
+                                    resolve(result);
+                                }
+                            });
+                        };
+                    }
+                });
+        });
+    };
+paymentSucessful('10')
 
 
 
@@ -235,5 +270,3 @@ function deleteDoc(documents) {
     });
 }
 //deleteDoc(cosmosConfig.deleteDocuments[0]);
-
-
