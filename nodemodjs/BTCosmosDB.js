@@ -189,6 +189,10 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                         'order_id': order_id,
                         'transaction_detail': 'Pending - Purchase'
                     });
+                    return new Promise((resolve,reject)=>{
+                    resolve(transaction_id)
+                    });
+                    
                 };
             });
     });
