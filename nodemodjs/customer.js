@@ -24,7 +24,7 @@ module.exports.openCustomerPayWithoutPage = openCustomerPayWithoutPage;
  * @param {*string} nonce 
  * @param {*var} res 
  */
-function chargeCard (amount,nonce,customertoken,merchantid,res,storageAddress) {
+function chargeCard (transactionid, amount,nonce,customertoken,merchantid,res,storageAddress) {
     //use merchantid for database stuff
     cvars.gateway.transaction.sale({
         amount: amount,
@@ -37,11 +37,16 @@ function chargeCard (amount,nonce,customertoken,merchantid,res,storageAddress) {
     }, function (err, result) { //we can send the whole RESULT so that the bot can manually use the json data
         if(!err){
             if (result.success) {
+                var braintreereceipt = result.id; //new braintree receipt id
                 var last4digit = result.transaction.creditCard.last4;
                 res.send("Payment of $" + amount + " has been made successfully. Payment is charged to card **** "+last4digit+" Thank you!");
             
                 var transactionDetails = {cardLast4Digit : last4digit , transactionAmount : amount, transactionTimeStamp : Date.now() };
                 queue2PayDetails.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
+                
+                //TODO add the database update to SUCCESSS Here
+                //updatetransaction(SUCCESS, transactionid, braintreereceipt, ...);
+
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
