@@ -137,7 +137,7 @@ function createCustomer(clientID,res) {
  * 
  * @param {*string} customerToken the customertoken to retrieve card details from
  */
-function openCustomerPay(sess,amount,customerToken,merchantid,res,page,savedaddress) {
+function openCustomerPay(transactionid, sess,amount,customerToken,merchantid,res,page,savedaddress) {
     cvars.gateway.customer.find(customerToken, function(err, customer) {
         if(!err){
             cvars.gateway.clientToken.generate({customerId: customerToken}, function (err, response) {
@@ -149,7 +149,8 @@ function openCustomerPay(sess,amount,customerToken,merchantid,res,page,savedaddr
             {
             clientoken : response.clientToken,
             amount: amount,
-            merchantid: merchantid
+            merchantid: merchantid,
+            transactionid: transactionid
             });
         });
     }
