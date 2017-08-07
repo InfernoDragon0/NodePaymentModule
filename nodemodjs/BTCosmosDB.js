@@ -175,6 +175,8 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                     var id1 = results.length;
                     var id = JSON.stringify(id1 + 1);
                     var transaction_id = id;
+                    Console.log("Transaction Sucessful");
+                    Console.log("Transaction ID : "+transaction_id);
                     addTransaction2db({
                         'id': id,
                         'transaction_id': transaction_id,
@@ -184,7 +186,7 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                         'datetime': datetime,
                         'amount': amount,
                         'order_id': order_id,
-                        'transcation_detail': 'Sucessful - Purchase'
+                        'transaction_detail': 'Sucessful - Purchase'
                     });
                 };
             });

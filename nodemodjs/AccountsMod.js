@@ -33,7 +33,7 @@ function transactionDetails(transactionID) {
                 var datetime = result['datetime'];
                 var amount = result['amount'];
                 var order_id = result['order_id'];
-                var transcation_detail = result['transcation_detail'];
+                var transaction_detail = result['transaction_detail'];
                 
                 // for testings = outputing variables 
                 console.log('transaction_id ='+transaction_id);
@@ -43,7 +43,7 @@ function transactionDetails(transactionID) {
                 console.log('datetime ='+datetime);
                 console.log('amount ='+amount);
                 console.log('order_id ='+order_id);
-                console.log('transcation_detail ='+transcation_detail);
+                console.log('transaction_detail ='+transaction_detail);
                 }
             }
         });
