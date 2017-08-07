@@ -157,13 +157,13 @@ app.post('/pay', function (req, res) {
  * processpayment handler, customer.chargeCard for details
  */
 app.post('/processpayment', function (req, res) {
-    if (!req.body.amount || !req.body.nonce || !req.session.customer || !req.body.merchantid) {
-        res.send("<p>Please provide amount, nonce, customer token and merchantid</p>");
+    if (!req.body.transactionid || !req.body.amount || !req.body.nonce || !req.session.customer || !req.body.merchantid) {
+        res.send("<p>Please provide transactionid, amount, nonce, customer token and merchantid</p>");
         return;
     }
     var storageAddress = req.session.storageAddress;
     console.log("storeaddress is " + storageAddress);
-    customer.chargeCard(req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res, storageAddress);
+    customer.chargeCard(req.body.transactionid, req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res, storageAddress);
 });
 
 app.post('/autopayment', function (req, res) {

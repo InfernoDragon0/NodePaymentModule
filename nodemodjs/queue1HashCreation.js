@@ -67,6 +67,7 @@ function searchQueue1Storage(hash,res,sess,page) {
             // result contains the entity
             console.log("Search Result");
             console.log(result);
+            var transactionid = result.transactionId._; //added transactionid
             var q2payment= result.paymentAmount._;
             var q2merchant=result.merchantId._;
             var q2clientid=result.clientId._;
@@ -77,9 +78,10 @@ function searchQueue1Storage(hash,res,sess,page) {
             if(timeNow<TimeoutTimer){
             var cpromise = BTDatabaseFunction.findBTtoken(q2clientid);
             cpromise.then(function(customertoken) {
-                customer.openCustomerPay(sess, q2payment, customertoken, q2merchant, res, page, q2savedAddress); //find customer, if customer not found overwrite but this should not happen
+                customer.openCustomerPay(transactionid, sess, q2payment, customertoken, q2merchant, res, page, q2savedAddress); //find customer, if customer not found overwrite but this should not happen
                
                 console.log("vars are " + customertoken + " q2payment " + q2payment + " q2merchant " + q2merchant + "q2address " + q2savedAddress);
+                console.log("Transaction id is " + transactionid);
         console.log(TimeoutTimer);
             console.log(result.unixTimestamp._ );
             console.log(Date.now());     
