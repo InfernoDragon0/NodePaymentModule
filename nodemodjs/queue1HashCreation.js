@@ -13,50 +13,44 @@ var retryOperations = new azure.ExponentialRetryPolicyFilter();
 var entGen = azure.TableUtilities.entityGenerator;
 
 function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID, clientID) {
-    var timeStamp1=entGen.Int64(Date.now())
-    var tDetails = {
+    var cpromise = BTDatabaseFunction.insertTransaction(clientID, merchantID, 'BTtransactionID', Date(), payment, 'OrderID');
+    cpromise.then(function (value) {
+        var transactionID = value;
+        var timeStamp1 = entGen.Int64(Date.now())
+        var tDetails = {
         PartitionKey: entGen.String('transactionUriHash'),
-        //rowkey in the future will be hash, in order to avoid colision
         RowKey: entGen.String(genHash),
         botAddress: entGen.String(address),
         paymentAmount: entGen.String(payment),
         merchantId: entGen.String(merchantID),
         clientId: entGen.String(clientID),
+        transactionId:entGen.String(transactionID),
         unixTimestamp: timeStamp1
     }
-    BTDatabaseFunction.insertTransaction(clientID,merchantID,'BTtransactionID',Date(),payment,'OrderID')
-    deletingQueue.deleteQueue(genHash,timeStamp1);
-    let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
-    tableSvc.createTableIfNotExists('b2sTransactionDetails', function (error, result, response) {
-        if (!error) {
-            let tDetailsBuffer = new Buffer(JSON.stringify(tDetails)).toString('base64');
-            tableSvc.insertEntity('b2sTransactionDetails', tDetails, function (error, result, response) {
-                if (!error) {
-                    console.log("Entity insertion Succesful!");
-                    console.log("-----");
-                    // console.log ("Table : "+ tableName);
-                    // console.log("Associated Hash/RowKey :" + RowKey);
-                    console.log("Entity inserted: " + tDetails);
-                    // console.log("-----");
-                    // console.log("test");
-                    // console.log("-----");
-                    // console.log(result);
-                    // console.log("-----");
-                    // console.log(response);
-                }
-                else {
-                    console.log(error);
-                }
-            });
-            // Table exists or created
-        }
-        else {
-            console.log(error);
-        }
+        deletingQueue.deleteQueue(genHash, timeStamp1);
+        let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
+        tableSvc.createTableIfNotExists('b2sTransactionDetails', function (error, result, response) {
+            if (!error) {
+                let tDetailsBuffer = new Buffer(JSON.stringify(tDetails)).toString('base64');
+                tableSvc.insertEntity('b2sTransactionDetails', tDetails, function (error, result, response) {
+                    if (!error) {
+                        console.log("Entity insertion Succesful!");
+                        console.log("-----");
+                        console.log("Entity inserted: " + tDetails);
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+                // Table exists or created
+            }
+            else {
+                console.log(error);
+            }
+        });
     });
-
-
 };
+
 
 //sendBotTransactionDetailsToTable("genhash1","address1","payment1","merchantID-1","clientID-1");
 
