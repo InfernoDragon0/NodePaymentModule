@@ -37,7 +37,7 @@ function chargeCard (transactionid, amount,nonce,customertoken,merchantid,res,st
     }, function (err, result) { //we can send the whole RESULT so that the bot can manually use the json data
         if(!err){
             if (result.success) {
-                var braintreereceipt = result.id; //new braintree receipt id
+                var braintreereceipt = result.transaction.id; //new braintree receipt id
                 var last4digit = result.transaction.creditCard.last4;
                 res.send("Payment of $" + amount + " has been made successfully. Payment is charged to card **** "+last4digit+" Thank you!");
             
