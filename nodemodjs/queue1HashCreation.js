@@ -13,20 +13,21 @@ var retryOperations = new azure.ExponentialRetryPolicyFilter();
 var entGen = azure.TableUtilities.entityGenerator;
 
 function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID, clientID) {
-    var cpromise = BTDatabaseFunction.insertTransaction(clientID, merchantID, 'BTtransactionID', Date(), payment, 'OrderID');
+    var cpromise = BTDatabaseFunction.insertTransaction(clientID, merchantID, 'Payment Pending', Date(), payment, 'OrderID');
     cpromise.then(function (value) {
         var transactionID = value;
+        console.log("Test test :" + transactionID);
         var timeStamp1 = entGen.Int64(Date.now())
         var tDetails = {
-        PartitionKey: entGen.String('transactionUriHash'),
-        RowKey: entGen.String(genHash),
-        botAddress: entGen.String(address),
-        paymentAmount: entGen.String(payment),
-        merchantId: entGen.String(merchantID),
-        clientId: entGen.String(clientID),
-        transactionId:entGen.String(transactionID),
-        unixTimestamp: timeStamp1
-    }
+            PartitionKey: entGen.String('transactionUriHash'),
+            RowKey: entGen.String(genHash),
+            botAddress: entGen.String(address),
+            paymentAmount: entGen.String(payment),
+            merchantId: entGen.String(merchantID),
+            clientId: entGen.String(clientID),
+            transactionId: entGen.String(transactionID),
+            unixTimestamp: timeStamp1
+        };
         deletingQueue.deleteQueue(genHash, timeStamp1);
         let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
         tableSvc.createTableIfNotExists('b2sTransactionDetails', function (error, result, response) {
@@ -45,8 +46,9 @@ function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID,
                 // Table exists or created
             }
             else {
-                console.log(error);
-            }
+                k
+
+            };
         });
     });
 };
@@ -54,7 +56,7 @@ function sendBotTransactionDetailsToTable(genHash, address, payment, merchantID,
 
 //sendBotTransactionDetailsToTable("genhash1","address1","payment1","merchantID-1","clientID-1");
 
-function searchQueue1Storage(hash,res,sess,page) {
+function searchQueue1Storage(hash, res, sess, page) {
     let tableSvc = azure.createTableService(AzureWebJobsStorage).withFilter(retryOperations);
     tableSvc.retrieveEntity('b2sTransactionDetails', 'transactionUriHash', hash, function (error, result, response) {
         if (!error) {
@@ -62,41 +64,41 @@ function searchQueue1Storage(hash,res,sess,page) {
             console.log("Search Result");
             console.log(result);
             var transactionid = result.transactionId._; //added transactionid
-            var q2payment= result.paymentAmount._;
-            var q2merchant=result.merchantId._;
-            var q2clientid=result.clientId._;
-            var q2savedAddress=result.botAddress._;
-            var TimeoutTimer =result.unixTimestamp._+300000; // 5minutes
+            var q2payment = result.paymentAmount._;
+            var q2merchant = result.merchantId._;
+            var q2clientid = result.clientId._;
+            var q2savedAddress = result.botAddress._;
+            var TimeoutTimer = result.unixTimestamp._ + 300000; // 5minutes
             var timeNow = Date.now();
 
-            if(timeNow<TimeoutTimer){
-            var cpromise = BTDatabaseFunction.findBTtoken(q2clientid);
-            cpromise.then(function(customertoken) {
-                customer.openCustomerPay(transactionid, sess, q2payment, customertoken, q2merchant, res, page, q2savedAddress); //find customer, if customer not found overwrite but this should not happen
-               
-                console.log("vars are " + customertoken + " q2payment " + q2payment + " q2merchant " + q2merchant + "q2address " + q2savedAddress);
-                console.log("Transaction id is " + transactionid);
-        console.log(TimeoutTimer);
-            console.log(result.unixTimestamp._ );
-            console.log(Date.now());     
-        }); 
-        }else{
-            console.log(" HASH TIMED OUT ");  
-            console.log(TimeoutTimer);
-            console.log(result.unixTimestamp._ )
-            console.log(Date.now()); 
-            console.log(Date.now(1000));
-             }
-        
+            if (timeNow < TimeoutTimer) {
+                var cpromise = BTDatabaseFunction.findBTtoken(q2clientid);
+                cpromise.then(function (customertoken) {
+                    customer.openCustomerPay(transactionid, sess, q2payment, customertoken, q2merchant, res, page, q2savedAddress); //find customer, if customer not found overwrite but this should not happen
+
+                    console.log("vars are " + customertoken + " q2payment " + q2payment + " q2merchant " + q2merchant + "q2address " + q2savedAddress);
+                    console.log("Transaction id is " + transactionid);
+                    console.log(TimeoutTimer);
+                    console.log(result.unixTimestamp._);
+                    console.log(Date.now());
+                });
+            } else {
+                console.log(" HASH TIMED OUT ");
+                console.log(TimeoutTimer);
+                console.log(result.unixTimestamp._)
+                console.log(Date.now());
+                console.log(Date.now(1000));
+            }
+
         }
-        else{
+        else {
             console.log("error has occured");
             console.log(error);
             // console.log("Error: Entity not found");
             // console.log("Hash Token: "+hash);
-            if(result==null){
+            if (result == null) {
                 console.log("Error: Hash Entity not found");
-                console.log("Hash Token: "+hash);
+                console.log("Hash Token: " + hash);
             }
         };
     });

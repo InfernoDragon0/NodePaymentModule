@@ -14,6 +14,7 @@ const collectionUrltransactionDetail = `${databaseUrl}/colls/transactionDetail`;
 module.exports.insertNewCustomer = insertNewCustomer;
 module.exports.findBTtoken = findBTtoken;
 module.exports.insertTransaction=insertTransaction;
+module.exports.paymentSucessful=paymentSucessful;
 
 function createDbIfNotExists(){
     client.readDatabase(databaseUrl, (err, result) => {
@@ -189,9 +190,9 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                         'order_id': order_id,
                         'transaction_detail': 'Pending - Purchase'
                     });
-                    return new Promise((resolve,reject)=>{
-                    resolve(transaction_id)
-                    });
+                    
+                    resolve(transaction_id);
+                    
                     
                 };
             });
@@ -199,7 +200,7 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
 };
 
 
-    function paymentSucessful(transaction_id) {
+    function paymentSucessful(transaction_id,braintreeID) {
     return new Promise((resolve, reject) =>{
         client.queryDocuments(collectionUrltransactionDetail,
         "Select * from c where c.id='"+transaction_id+"'").toArray((err, results)=>{
@@ -215,7 +216,8 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                         }
                         for (let result of results) {
                             console.log("ihi");
-                            result.transaction_detail = "Sucessful - Purchase"
+                            result.transaction_detail = 'Sucessful - Purchase';
+                            result.btTransaction_id = braintreeID;
                             let documentUrl = `${collectionUrltransactionDetail}/docs/${transaction_id}`;
                             client.replaceDocument(documentUrl, result, (err, result) => {
                                 if (err) {
@@ -230,7 +232,7 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                 });
         });
     };
-paymentSucessful('10')
+// paymentSucessful('10')
 
 
 

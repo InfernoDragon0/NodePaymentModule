@@ -45,7 +45,7 @@ function chargeCard (transactionid, amount,nonce,customertoken,merchantid,res,st
                 queue2PayDetails.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
                 
                 //TODO add the database update to SUCCESSS Here
-                //updatetransaction(SUCCESS, transactionid, braintreereceipt, ...);
+                BTDatabasefunction.paymentSucessful(transactionid,braintreereceipt);
 
             }
             else if (!result.success && result.transaction) {
