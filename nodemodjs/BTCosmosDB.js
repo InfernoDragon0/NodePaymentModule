@@ -155,6 +155,41 @@ function findBTtoken(customerID) {
     });
 };
 
+function addRefund(customer_id, merchant_id, btTransaction_id, amount, order_id) {
+    return new Promise((resolve, reject) => {
+        client.queryDocuments(collectionUrltransactionDetail,
+            "Select * from c").toArray((err, results) => {
+                if (err) {
+                    console.log(JSON.stringify(err));
+                }
+                else {
+                    var id1 = results.length;
+                    var id = JSON.stringify(id1 + 1);
+                    var transaction_id = id;
+                    var datetime = Date();
+                    console.log('Transaction Recorded');
+                    console.log('Pending Payment - Purchase')
+                    console.log('Transaction ID : ' + transaction_id);
+                    addTransaction2db({
+                        'id': id,
+                        'transaction_id': transaction_id,
+                        'customer_id': customer_id,
+                        'merchant_id': merchant_id,
+                        'btTransaction_id': btTransaction_id,
+                        'datetime': datetime,
+                        'amount': amount,
+                        'order_id': order_id,
+                        'transaction_detail': 'Refund - Purchase'
+                    });
+
+                    resolve(transaction_id);
+
+
+                };
+            });
+    });
+};
+
 function addTransaction2db(data) {
     client.createDocument(collectionUrltransactionDetail, data, (err, created) => {
         if (err) {
