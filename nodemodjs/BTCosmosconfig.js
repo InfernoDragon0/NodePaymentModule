@@ -1,7 +1,7 @@
 var cosmosConfig = {}
 
-cosmosConfig.endpoint = "https://jepayphrase1.documents.azure.com:443/";
-cosmosConfig.primaryKey = "WNkCU96wTrjNXtXUknl1BTbyCdMMFZpigVBilvudK0CDnAC1Mfi16W4N1OhYgXrGvk73AaWX1EqctHxegWigFg==";
+cosmosConfig.endpoint = "https://jetransact.documents.azure.com:443/";
+cosmosConfig.primaryKey = "jXxaBwnQTqxkR1igcvDWPy02qjGfJJW3aceLte9FL89hllZSUKMpecFtRIPOEaFs0y6YWXbyT783KbpQf9teFA==";
 
 cosmosConfig.database = {
     'id': 'jElement'

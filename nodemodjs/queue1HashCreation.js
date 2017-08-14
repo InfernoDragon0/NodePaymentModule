@@ -3,7 +3,7 @@ const customer = require('./customer.js');
 var BTDatabaseFunction = require("./BTCosmosDB");
 var deletingQueue = require('./queue1DeletingQueue');
 // connection to queue 1
-let AzureWebJobsStorage = 'DefaultEndpointsProtocol=https;AccountName=calebqueue1hashcreation;AccountKey=fNArUQy/Z3uvwhPUefMeYes/bv/FkuckFlJ40xzBxS8CfaBdUBJHQa8F7S0vsHmVPHqpqzCWDtpj15bx1kIhSA==;EndpointSuffix=core.windows.net'
+let AzureWebJobsStorage = 'DefaultEndpointsProtocol=https;AccountName=calebtestqueue;AccountKey=1hbmP/8F5WRK5V2qubfwKd3D0mpJD7uaiCxf7NUO0Czn5iklf9uOqIz/A3mYvYUcfouvWEZskszhV35QBVuuOg==;EndpointSuffix=core.windows.net'
 
 module.exports.sendBotTransactionDetailsToTable = sendBotTransactionDetailsToTable;
 module.exports.searchQueue1Storage = searchQueue1Storage;
