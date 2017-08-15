@@ -101,7 +101,7 @@ function insertNewCustomerDataInput(data) {
         }
     });
 };
-function insertNewCustomer(newcustomer_id, newBTwalletToken) {
+function insertNewCustomer(newcustomer_id, newBTwalletToken,customer_contact_no,pin_6digit) {
     return new Promise((resolve, reject) => {
         client.queryDocuments(collectionUrlcustomerBTDetail,
             "Select * from root r where r.customer_id='" + newcustomer_id + "'").toArray((err, results) => {
@@ -112,7 +112,13 @@ function insertNewCustomer(newcustomer_id, newBTwalletToken) {
                 else {
                     if (results.length < 1) {
                         console.log("No existing customer found");
-                        insertNewCustomerDataInput({ 'id': newcustomer_id, 'customer_id': newcustomer_id, 'customer_BTwalletToken': newBTwalletToken });
+                        insertNewCustomerDataInput({'id': newcustomer_id, 
+                                                    'customer_id': newcustomer_id,
+                                                    'customer_BTwalletToken': newBTwalletToken,
+                                                    'contact_No':customer_contact_no,
+                                                    'wallet_id': newcustomer_id,
+                                                    'pin_6digit' : pin_6digit
+                                                    });
                         resolve('-1');
                         return;
                     }

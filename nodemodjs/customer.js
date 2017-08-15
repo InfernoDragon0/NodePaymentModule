@@ -116,7 +116,7 @@ function createCustomer(clientID,res) {
                 //TODO: database stuff
 
                 //database.addCustomer(customerid, customertoken) *** check if customer token exist, if exist try not to overwrite
-                BTDatabasefunction.insertNewCustomer(clientID,result.customer.id);
+                BTDatabasefunction.insertNewCustomer(clientID,result.customer.id,contact_no,pin);
             }
             else {
                 res.send("Error occurred creating customer: " + result);
