@@ -187,7 +187,8 @@ function addRefund(customer_id, merchant_id, btTransaction_id, amount, order_id)
                         'dateOnly' : today,
                         'amount': amount,
                         'order_id': order_id,
-                        'transaction_detail': 'Refund - Purchase'
+                        'transaction_detail': 'Refund - Purchase',
+                        'transact_check': 'N'
                     });
 
                     resolve(transaction_id);
@@ -240,7 +241,8 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                         'dateOnly' : today,
                         'amount': amount,
                         'order_id': order_id,
-                        'transaction_detail': 'Pending - Purchase'
+                        'transaction_detail': 'Pending - Purchase',
+                        'transact_check': 'N'
                     });
 
                     resolve(transaction_id);
