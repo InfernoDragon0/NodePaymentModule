@@ -18,6 +18,7 @@ module.exports.findBTtoken = findBTtoken;
 module.exports.insertTransaction = insertTransaction;
 module.exports.paymentSucessful = paymentSucessful;
 module.exports.retrievePinandContactNo = retrievePinandContactNo;
+module.exports.updateWalletAmount=updateWalletAmount;
 
 function createDbIfNotExists() {
     client.readDatabase(databaseUrl, (err, result) => {
@@ -104,7 +105,7 @@ function insertNewCustomerDataInput(data) {
         }
     });
 };
-function insertNewCustomer(newcustomer_id, newBTwalletToken,customer_contact_no,pin_6digit) {
+function insertNewCustomer(newcustomer_id, newBTwalletToken, customer_contact_no, pin_6digit) {
     pin_6digit = crypto.createHash('sha256').update(pin_6digit).digest('base64');
     return new Promise((resolve, reject) => {
         client.queryDocuments(collectionUrlcustomerBTDetail,
@@ -116,14 +117,15 @@ function insertNewCustomer(newcustomer_id, newBTwalletToken,customer_contact_no,
                 else {
                     if (results.length < 1) {
                         console.log("No existing customer found");
-                        insertNewCustomerDataInput({'id': newcustomer_id, 
-                                                    'customer_id': newcustomer_id,
-                                                    'customer_BTwalletToken': newBTwalletToken,
-                                                    'contact_No':customer_contact_no,
-                                                    'wallet_id': newcustomer_id,
-                                                    'wallet_amt' : 0,
-                                                    'pin_6digit' : pin_6digit
-                                                    });
+                        insertNewCustomerDataInput({
+                            'id': newcustomer_id,
+                            'customer_id': newcustomer_id,
+                            'customer_BTwalletToken': newBTwalletToken,
+                            'contact_No': customer_contact_no,
+                            'wallet_id': newcustomer_id,
+                            'wallet_amt': 0,
+                            'pin_6digit': pin_6digit
+                        });
                         resolve('-1');
                         return;
                     }
@@ -178,6 +180,7 @@ function retrievePinandContactNo(customerID) {
                     if (results.length < 1) {
                         console.log("No data found");
                         resolve('-1');
+                        reject();
                         return;
                     }
                     for (let result of results) {
@@ -185,7 +188,7 @@ function retrievePinandContactNo(customerID) {
                         var scustmoer_id = result["customer_id"];
                         var pin_6digit = result["pin_6digit"];
                         var contact_No = result["contact_No"];
-                        var arrayStorage = [ pin_6digit , contact_No];
+                        var arrayStorage = [pin_6digit, contact_No];
                         resolve(arrayStorage);
                     }
                 }
@@ -209,8 +212,8 @@ function addRefund(customer_id, merchant_id, btTransaction_id, amount, order_id)
                     var dd = today.getDate();
                     var mm = today.getMonth() + 1;
                     var yyyy = today.getFullYear();
-                    if (dd < 10) { dd = '0' + dd;}
-                    if (mm < 10) { mm = '0' + mm;}
+                    if (dd < 10) { dd = '0' + dd; }
+                    if (mm < 10) { mm = '0' + mm; }
                     var today = dd + '/' + mm + '/' + yyyy;
                     console.log('Transaction Recorded');
                     console.log('Refund - Purchase')
@@ -222,7 +225,7 @@ function addRefund(customer_id, merchant_id, btTransaction_id, amount, order_id)
                         'merchant_id': merchant_id,
                         'btTransaction_id': btTransaction_id,
                         'datetime': datetime,
-                        'dateOnly' : today,
+                        'dateOnly': today,
                         'amount': amount,
                         'order_id': order_id,
                         'transaction_detail': 'Refund - Purchase',
@@ -263,8 +266,8 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                     var dd = today.getDate();
                     var mm = today.getMonth() + 1;
                     var yyyy = today.getFullYear();
-                    if (dd < 10) { dd = '0' + dd;}
-                    if (mm < 10) { mm = '0' + mm;}
+                    if (dd < 10) { dd = '0' + dd; }
+                    if (mm < 10) { mm = '0' + mm; }
                     var today = dd + '/' + mm + '/' + yyyy;
                     console.log('Transaction Recorded');
                     console.log('Pending Payment - Purchase')
@@ -276,7 +279,7 @@ function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime,
                         'merchant_id': merchant_id,
                         'btTransaction_id': btTransaction_id,
                         'datetime': datetime,
-                        'dateOnly' : today,
+                        'dateOnly': today,
                         'amount': amount,
                         'order_id': order_id,
                         'transaction_detail': 'Pending - Purchase',
@@ -325,6 +328,62 @@ function paymentSucessful(transaction_id, braintreeID) {
     });
 };
 // paymentSucessful('10')
+
+
+updateWalletAmount('54321',-10)
+function updateWalletAmount(customerID, amount) {
+    return new Promise((resolve, reject) => {
+        client.queryDocuments(collectionUrlcustomerBTDetail,
+            "Select * from c where c.id='" + customerID + "'").toArray((err, results) => {
+                if (err) {
+                    console.log(JSON.stringify(err));
+                    resolve('-1');
+                }
+                else {
+                    if (results.length < 1) {
+                        console.log('No data found');
+                        resolve('-1');
+                        return;
+                    }
+                    for (let result of results) {
+                        
+                        result.wallet_amt=result.wallet_amt+amount;
+                        let documentUrl = `${collectionUrlcustomerBTDetail}/docs/${customerID}`;
+                        client.replaceDocument(documentUrl, result, (err, result) => {
+                            if (err) {
+                                console.log(JSON.stringify(err));
+                            }
+                            else {
+                                console.log("Wallet "+ amount);
+                                resolve('Success');
+                            }
+                        });
+                    };
+                }
+            });
+    });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
