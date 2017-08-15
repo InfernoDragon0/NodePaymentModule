@@ -87,8 +87,7 @@ function getUserDocument(documents) {
 //getUserDocument(cosmosConfig.customerBTDetaildocuments);
 
 
-
-
+//test
 
 ////////////////////////////////////Functions in Use////////////////////////////////////
 // insert new client with new bttoken
