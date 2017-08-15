@@ -180,11 +180,11 @@ app.post('/autopayment', function (req, res) {
  * create customer handler, customer.createCustomer for details
  */
 app.get("/create/customer", function (req, res) {
-    if (!req.query.clientid) {
-        res.send("<p>Please provide clientid</p>");
+    if (!req.query.clientid || !req.query.contact_No || !req.query.pin) {
+        res.send("<p>Please provide clientid, contactno, pin</p>");
         return;
     }
-    customer.createCustomer(req.query.clientid, res);
+    customer.createCustomer(req.query.clientid, res, req.query.contact_No, req.query.pin);
 });
 
 app.get("/find/customer", function (req, res) {

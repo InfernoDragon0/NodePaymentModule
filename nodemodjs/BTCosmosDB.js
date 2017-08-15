@@ -1,5 +1,7 @@
 const cosmosConfig = require("./BTCosmosconfig");
 const docdbClient = require("documentdb").DocumentClient;
+var crypto = require('crypto');
+var encryption = 'sha256';
 
 const client = new docdbClient(cosmosConfig.endpoint, { masterKey: cosmosConfig.primaryKey });
 
@@ -102,6 +104,7 @@ function insertNewCustomerDataInput(data) {
     });
 };
 function insertNewCustomer(newcustomer_id, newBTwalletToken,customer_contact_no,pin_6digit) {
+    pin_6digit = crypto.createHash('sha256').update(pin_6digit).digest('base64');
     return new Promise((resolve, reject) => {
         client.queryDocuments(collectionUrlcustomerBTDetail,
             "Select * from root r where r.customer_id='" + newcustomer_id + "'").toArray((err, results) => {

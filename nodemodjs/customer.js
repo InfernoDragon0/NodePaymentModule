@@ -108,11 +108,11 @@ function autoChargeCard (amount,customertoken,merchantid,res,storageAddress) {
  * @param {*string} clientID the client's ID to link with the customertoken
  * @param {*var} res the res
  */
-function createCustomer(clientID,res) {
+function createCustomer(clientID,res, contact_no, pin) {
     cvars.gateway.customer.create({firstName: clientID }, function (err, result) {
         if (!err) {
             if (result.success) {
-                res.send("<p>Customer Token is: " + result.customer.id + "</p><p> Created for client ID " + clientID + "</p>");
+                res.send("<p>Customer Token is: " + result.customer.id + "</p><p> Created for client ID " + clientID + "</p> contactno is " + contact_no + "pin is " + pin);
                 //TODO: database stuff
 
                 //database.addCustomer(customerid, customertoken) *** check if customer token exist, if exist try not to overwrite
