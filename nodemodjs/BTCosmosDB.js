@@ -17,6 +17,7 @@ module.exports.insertNewCustomer = insertNewCustomer;
 module.exports.findBTtoken = findBTtoken;
 module.exports.insertTransaction = insertTransaction;
 module.exports.paymentSucessful = paymentSucessful;
+module.exports.retrievePinandContactNo = retrievePinandContactNo;
 
 function createDbIfNotExists() {
     client.readDatabase(databaseUrl, (err, result) => {
@@ -185,8 +186,6 @@ function retrievePinandContactNo(customerID) {
                         var pin_6digit = result["pin_6digit"];
                         var contact_No = result["contact_No"];
                         var arrayStorage = [ pin_6digit , contact_No];
-                        console.log(arrayStorage[0]);
-                        console.log(arrayStorage[1]);
                         resolve(arrayStorage);
                     }
                 }

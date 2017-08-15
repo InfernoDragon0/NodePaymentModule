@@ -57,7 +57,7 @@ app.get('/', function (req, res) { //base page
  *
  * user: the clientid to authenticate
  * pin: the pin to check against the clientid
- * test variables are USER : PIN {"1" : "121312", "2" : "131154", "3" : "665544"};
+ * now connected to real database
  */
 app.post('/authenticate', function (req, res) { //base page
     if (!req.body.user || !req.body.pin || req.body.pin.length != 6) {
@@ -69,12 +69,15 @@ app.post('/authenticate', function (req, res) { //base page
         res.send("Already Authorized. At " + req.session.authorized);
     }
     else {
-        if (authenticator.authRequest(req.session, req.body.user, req.body.pin)) {
-            res.send("Authorized. At " + req.session.authorized);
-        }
-        else {
-            res.send("Invalid user and pin combination. try again!");
-        }
+        var promisething = authenticator.authRequest(req.session, req.body.user, req.body.pin);
+        promisething.then((value) => {
+            if (value) {
+                res.send("Authorized. At " + req.session.authorized);
+            }
+            else {
+                res.send("Invalid user and pin combination. try again!");
+            }
+        })
     }
 });
 

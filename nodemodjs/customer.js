@@ -42,11 +42,13 @@ function chargeCard (transactionid, amount,nonce,customertoken,merchantid,res,st
                 res.send("Payment of $" + amount + " has been made successfully. Payment is charged to card **** "+last4digit+" Thank you!");
             
                 var transactionDetails = {cardLast4Digit : last4digit , transactionAmount : amount, transactionTimeStamp : Date.now() };
+
                 queue2PayDetails.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
-                
-                //TODO add the database update to SUCCESSS Here
                 BTDatabasefunction.paymentSucessful(transactionid,braintreereceipt);
 
+                if (merchantid == -1) {
+                    //TODO add database.updateWalletAmount(id, amount);
+                }
             }
             else if (!result.success && result.transaction) {
                 res.send(result.transaction.status + ": " + result.transaction.processorResponseText);
