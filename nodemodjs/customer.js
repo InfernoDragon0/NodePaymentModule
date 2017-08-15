@@ -11,20 +11,26 @@ module.exports.openCustomerPay = openCustomerPay;
 module.exports.createCustomer = createCustomer;
 module.exports.retrieveCustomerCardDetails=retrieveCustomerCardDetails;
 module.exports.openCustomerPayWithoutPage = openCustomerPayWithoutPage;
+
 /**
- * API Description: 
+ * API Description:
  * This is process payment method for single card charges
- * 
+ *
  * amount: the amount to pay, 1 = $1.00
  * nonce: the card token to be charged
  * To use: send a request to localhost:3000/processpayment via POST
  * Example Request: /processpayment + POSTDATA{ amount: 50.00, nonce: "x", customertoken: "12345678" }
- * 
- * @param {*double} amount 
- * @param {*string} nonce 
- * @param {*var} res 
+ *
+ * @param transactionid
+ * @param {*double} amount
+ * @param {*string} nonce
+ * @param customertoken
+ * @param merchantid
+ * @param {*var} res
+ * @param storageAddress
+ * @param sess
  */
-function chargeCard (transactionid, amount,nonce,customertoken,merchantid,res,storageAddress) {
+function chargeCard (transactionid, amount,nonce,customertoken,merchantid,res,storageAddress, sess) {
     //use merchantid for database stuff
     cvars.gateway.transaction.sale({
         amount: amount,
@@ -40,14 +46,15 @@ function chargeCard (transactionid, amount,nonce,customertoken,merchantid,res,st
                 var braintreereceipt = result.transaction.id; //new braintree receipt id
                 var last4digit = result.transaction.creditCard.last4;
                 res.send("Payment of $" + amount + " has been made successfully. Payment is charged to card **** "+last4digit+" Thank you!");
-            
+
                 var transactionDetails = {cardLast4Digit : last4digit , transactionAmount : amount, transactionTimeStamp : Date.now() };
 
                 queue2PayDetails.sendPayDetailsToQueueSucess(storageAddress,transactionDetails);
                 BTDatabasefunction.paymentSucessful(transactionid,braintreereceipt);
 
                 if (merchantid == -1) {
-                    //TODO add database.updateWalletAmount(id, amount);
+                    var id = sess["clientid"];
+                    BTDatabasefunction.updateWalletAmount(id, amount);
                 }
             }
             else if (!result.success && result.transaction) {
@@ -100,15 +107,17 @@ function autoChargeCard (amount,customertoken,merchantid,res,storageAddress) {
  * API Description:
  * Creates a customer token for the clientID that is given and stores it in the database
  * We do not need to store customer details on braintree as MongoDB will store the customer details already
- * 
+ *
  * Call this upon Bot receiving a new account creation
  * When calling this more than once, the API will check if there is an existing
  * customerToken. If there is, the returned customer token will be ignored.
- * 
+ *
  * Braintree side will store the client's name as clientID
- * 
+ *
  * @param {*string} clientID the client's ID to link with the customertoken
  * @param {*var} res the res
+ * @param contact_no
+ * @param pin
  */
 function createCustomer(clientID,res, contact_no, pin) {
     cvars.gateway.customer.create({firstName: clientID }, function (err, result) {

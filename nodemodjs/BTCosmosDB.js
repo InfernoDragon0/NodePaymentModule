@@ -329,9 +329,8 @@ function paymentSucessful(transaction_id, braintreeID) {
 };
 // paymentSucessful('10')
 
-
-updateWalletAmount('54321',-10)
 function updateWalletAmount(customerID, amount) {
+    amount = parseFloat(amount);
     return new Promise((resolve, reject) => {
         client.queryDocuments(collectionUrlcustomerBTDetail,
             "Select * from c where c.id='" + customerID + "'").toArray((err, results) => {

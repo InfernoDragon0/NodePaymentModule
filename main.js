@@ -166,7 +166,7 @@ app.post('/processpayment', function (req, res) {
     }
     var storageAddress = req.session.storageAddress;
     console.log("storeaddress is " + storageAddress);
-    customer.chargeCard(req.body.transactionid, req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res, storageAddress);
+    customer.chargeCard(req.body.transactionid, req.body.amount, req.body.nonce, req.session.customer, req.body.merchantid, res, storageAddress, req.session);
 });
 
 app.post('/autopayment', function (req, res) {

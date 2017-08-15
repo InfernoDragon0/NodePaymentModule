@@ -75,7 +75,7 @@ function searchQueue1Storage(hash, res, sess, page) {
                 var cpromise = BTDatabaseFunction.findBTtoken(q2clientid);
                 cpromise.then(function (customertoken) {
                     customer.openCustomerPay(transactionid, sess, q2payment, customertoken, q2merchant, res, page, q2savedAddress); //find customer, if customer not found overwrite but this should not happen
-
+                    sess["clientid"] = result.clientId._;
                     console.log("vars are " + customertoken + " q2payment " + q2payment + " q2merchant " + q2merchant + "q2address " + q2savedAddress);
                     console.log("Transaction id is " + transactionid);
                     console.log(TimeoutTimer);
