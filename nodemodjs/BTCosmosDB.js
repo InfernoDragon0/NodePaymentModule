@@ -120,6 +120,7 @@ function insertNewCustomer(newcustomer_id, newBTwalletToken,customer_contact_no,
                                                     'customer_BTwalletToken': newBTwalletToken,
                                                     'contact_No':customer_contact_no,
                                                     'wallet_id': newcustomer_id,
+                                                    'wallet_amt' : 0,
                                                     'pin_6digit' : pin_6digit
                                                     });
                         resolve('-1');
@@ -157,6 +158,36 @@ function findBTtoken(customerID) {
                         console.log("Searching Client ID: " + scustmoer_id);
                         console.log("Coresponding BT Token: " + scustomer_BTtoken);
                         resolve(scustomer_BTtoken);
+                    }
+                }
+            });
+    });
+};
+
+// retrievePinandContactNo('54321');
+function retrievePinandContactNo(customerID) {
+    return new Promise((resolve, reject) => {
+        client.queryDocuments(collectionUrlcustomerBTDetail,
+            "Select * from root r where r.customer_id='" + customerID + "'").toArray((err, results) => {
+                if (err) {
+                    console.log(JSON.stringify(err));
+                    resolve('-1');
+                }
+                else {
+                    if (results.length < 1) {
+                        console.log("No data found");
+                        resolve('-1');
+                        return;
+                    }
+                    for (let result of results) {
+                        console.log("----------");
+                        var scustmoer_id = result["customer_id"];
+                        var pin_6digit = result["pin_6digit"];
+                        var contact_No = result["contact_No"];
+                        var arrayStorage = [ pin_6digit , contact_No];
+                        console.log(arrayStorage[0]);
+                        console.log(arrayStorage[1]);
+                        resolve(arrayStorage);
                     }
                 }
             });
