@@ -27,7 +27,9 @@ module.exports.findBTtoken = findBTtoken;
 module.exports.insertTransaction = insertTransaction;
 module.exports.paymentSucessful = paymentSucessful;
 // module.exports.retrievePinandContactNo = retrievePinandContactNo;
-module.exports.updateWalletAmount=updateWalletAmount;
+// module.exports.updateWalletAmount=updateWalletAmount;
+module.exports.WalletTransaction=WalletTransaction;
+
 
 function createDbIfNotExists() {
     client.readDatabase(databaseUrl, (err, result) => {
@@ -309,7 +311,116 @@ function paymentSucessful(transaction_id, braintreeID) {
 };
 // paymentSucessful('10')
 
+function WalletTransaction(clientID, Amount, btID) {
+    var cpromise = updateWalletAmount(clientID, Amount);
+    cpromise.then(function (value) {
+        if (value == 'Success') {
+            insertTransactionWalletTopUp(clientID, Amount, btID)
+        }
+        else{};
+    });
+}
+
 function updateWalletAmount(customerID, amount) {
+    amount = parseFloat(amount);
+    return new Promise((resolve, reject) => {
+        client.queryDocuments(collectionUrlcustomerBTDetail,
+            "Select * from c where c.id='" + customerID + "'").toArray((err, results) => {
+            if (err) {
+                console.log(JSON.stringify(err));
+                resolve('-1');
+            } else {
+                if (results.length < 1) {
+                    console.log('No data found');
+                    resolve('-1');
+                    return;
+                }
+                for (let result of results) {
+
+                    result.wallet_amt = result.wallet_amt + amount;
+                    if (result.wallet_amt <= 0) {
+                        console.log('Insufficent Funds in Your Wallet');
+                        console.log('Please top up or switch to auto-top up');
+                        resolve('Insufficent Funds');
+                    } else {
+                        let documentUrl = `${collectionUrlcustomerBTDetail}/docs/${customerID}`;
+                        client.replaceDocument(documentUrl, result, (err, result) => {
+                            if (err) {
+                                console.log(JSON.stringify(err));
+                            } else {
+                                console.log("Wallet " + amount);
+                                resolve('Success');
+                            }
+                        });
+                    };
+                };
+            }
+        });
+    });
+};
+
+function insertTransactionWalletTopUp(customer_id, amount, btTransaction_id) {
+    return new Promise((resolve, reject) => {
+        client.queryDocuments(collectionUrltransactionDetail,
+            "Select * from c").toArray((err, results) => {
+            if (err) {
+                console.log(JSON.stringify(err));
+            } else {
+                var datetime = new Date()
+                var id1 = results.length;
+                var id = JSON.stringify(id1 + 1);
+                var transaction_id = id;
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+                var today = dd + '/' + mm + '/' + yyyy;
+                console.log('Transaction Recorded');
+                if (amount < 0) {
+                    console.log('Wallet-Payment')
+                    console.log('Transaction ID : ' + transaction_id);
+                    addTransaction2db({
+                        'id': id,
+                        'transaction_id': transaction_id,
+                        'customer_id': customer_id,
+                        'merchant_id': '-1',
+                        'btTransaction_id': btTransaction_id,
+                        'datetime': datetime,
+                        'dateOnly': today,
+                        'amount': amount,
+                        'transaction_detail': 5
+                    });
+                } else {
+                    console.log('Wallet-TopUp')
+                    console.log('Transaction ID : ' + transaction_id);
+                    addTransaction2db({
+                        'id': id,
+                        'transaction_id': transaction_id,
+                        'customer_id': customer_id,
+                        'merchant_id': '-1',
+                        'btTransaction_id': btTransaction_id,
+                        'datetime': datetime,
+                        'dateOnly': today,
+                        'amount': amount,
+                        'transaction_detail': 4
+                    });
+                };
+
+                resolve(transaction_id);
+
+
+            };
+        });
+    });
+};
+
+/*function updateWalletAmount(customerID, amount) {
     amount = parseFloat(amount);
     return new Promise((resolve, reject) => {
         client.queryDocuments(collectionUrlcustomerBTDetail,
@@ -344,7 +455,7 @@ function updateWalletAmount(customerID, amount) {
 };
 
 
-
+*/
 
 
 
