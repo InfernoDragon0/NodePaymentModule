@@ -17,7 +17,7 @@ module.exports.insertNewCustomer = insertNewCustomer;
 module.exports.findBTtoken = findBTtoken;
 module.exports.insertTransaction = insertTransaction;
 module.exports.paymentSucessful = paymentSucessful;
-module.exports.retrievePinandContactNo = retrievePinandContactNo;
+// module.exports.retrievePinandContactNo = retrievePinandContactNo;
 module.exports.updateWalletAmount=updateWalletAmount;
 
 function createDbIfNotExists() {
@@ -167,34 +167,7 @@ function findBTtoken(customerID) {
     });
 };
 
-// retrievePinandContactNo('54321');
-function retrievePinandContactNo(customerID) {
-    return new Promise((resolve, reject) => {
-        client.queryDocuments(collectionUrlcustomerBTDetail,
-            "Select * from root r where r.customer_id='" + customerID + "'").toArray((err, results) => {
-                if (err) {
-                    console.log(JSON.stringify(err));
-                    resolve('-1');
-                }
-                else {
-                    if (results.length < 1) {
-                        console.log("No data found");
-                        resolve('-1');
-                        reject();
-                        return;
-                    }
-                    for (let result of results) {
-                        console.log("----------");
-                        var scustmoer_id = result["customer_id"];
-                        var pin_6digit = result["pin_6digit"];
-                        var contact_No = result["contact_No"];
-                        var arrayStorage = [pin_6digit, contact_No];
-                        resolve(arrayStorage);
-                    }
-                }
-            });
-    });
-};
+
 
 function addRefund(customer_id, merchant_id, btTransaction_id, amount, order_id) {
     return new Promise((resolve, reject) => {
