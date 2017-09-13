@@ -191,7 +191,7 @@ module.exports.retrieveIdSettlement = retrieveIdSettlement;
 function retrieveIdSettlement(settlement_id) {
     return new Promise((resolve, reject) => {
 
-        request('api.jungleelement.com/v1' + 'get/Settlement/{' +settlement_id +'}', function (error, response, body) {
+        request('api.jungleelement.com/v1' + 'get/settlement/{' +settlement_id +'}', function (error, response, body) {
             if(response.code >= 200 <=299){
                 console.log('Settlement details retrieved successfully')
                 resolve(JSON.parse(body));
@@ -218,7 +218,7 @@ module.exports.updateIdSettlement = updateIdSettlement;
 
 function updateIdSettlement(settlement_id, fk_merchant_id, fk_branch_id, fk_transaction_id, settlement_amount) {
     return new Promise((resolve, reject) => {
-        request.post('api.jungleelement.com/v1' + 'post/settlement/{' + settlement_id + '}',
+        request.post('api.jungleelement.com/v1' + 'put/settlement/{' + settlement_id + '}',
         {
             form:
             {
@@ -248,10 +248,10 @@ function updateIdSettlement(settlement_id, fk_merchant_id, fk_branch_id, fk_tran
 
 module.exports.deleteIdSettlement = deleteIdSettlement;
 
-function deleteIdTransaction(transaction_id) {
+function deleteIdSettlement(settlement_id) {
     return new Promise((resolve, reject) => {
 
-        request('api.jungleelement.com/v1' + 'delete/settlement/{' + transaction_id + '}', function (error, response, body) {
+        request('api.jungleelement.com/v1' + 'delete/settlement/{' + settlement_id + '}', function (error, response, body) {
             if(response.code >= 200 <=299){
                 console.log('Successfully deleted Settlement')
                 resolve(JSON.parse(body));
