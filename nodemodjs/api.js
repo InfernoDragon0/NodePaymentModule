@@ -6,7 +6,7 @@ function retrieveTransactions() {
     return new Promise((resolve, reject) => {
 
         request('api.jungleelement.com/v1' + 'get/transaction', function (error, response, body) {
-            if(response.code >= 200 <=299){
+            if(response.code >= 200 && response.code <= 299){
                 console.log('Transaction details retrieved successfully')
                 resolve(JSON.parse(body));
             }
@@ -272,6 +272,26 @@ function deleteIdSettlement(settlement_id) {
     })//close promise
 };
 
+//confirm settlement // for merchant
+
+module.exports.confirmSettlement = confirmSettlement;
+
+function confirmSettlement() {
+    request.post(url + 'put/settlement/settlement_id%3A' + settlement_id,
+        {
+            form:
+            {
+                "transaction_complete": transaction_complete,
+            }
+        }, function (error, response, body) {
+            if (error) {
+                console.log('error:', error); // Print the error if one occurred 
+                return;
+            }
+            console.log('body:', body);
+        });
+};
+
 // for accounting
 //can't be used
 
@@ -331,25 +351,6 @@ function deleteIdSettlement(settlement_id) {
 //         });
 // };
 
-//confirm settlement
-
-module.exports.confirmSettlement = confirmSettlement;
-
-function confirmSettlement(settlement_id, transaction_complete) {
-    request.post(url + 'api/Settlement/settlement_id%3A' + settlement_id,
-        {
-            form:
-            {
-                "transaction_complete": transaction_complete,
-            }
-        }, function (error, response, body) {
-            if (error) {
-                console.log('error:', error); // Print the error if one occurred 
-                return;
-            }
-            console.log('body:', body);
-        });
-};
 
 // retrieve settlement with a transaction id
 //can't be used

@@ -110,23 +110,23 @@ function retrieveTransactions() {
             if (value.statusCode == 200) {
                 var token = value.body.token
                 request.GET(url + '/transaction')
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .end((err, res) => {
-                    if (res.statusCode == 200) {
-                        console.log('Transaction details retrieved successfully\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 404) {
-                        console.log('Transaction not found\n')
-                        resolve(res);
-                    }
-                })
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .end((err, res) => {
+                        if (res.statusCode == 200) {
+                            console.log('Transaction details retrieved successfully\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 404) {
+                            console.log('Transaction not found\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -140,6 +140,16 @@ function retrieveTransactions() {
 }
 
 // Add transaction record
+/*
+var form = {
+    "fk_user_id": 0,
+    "fk_merchant_id": 0,
+    "fk_branch_id": 0,
+    "braintree_transaction_id": "string",
+    "transaction_amount": 0,
+    "transaction_type": 0
+}
+*/
 
 module.exports.createTransaction = createTransaction;
 
@@ -150,20 +160,20 @@ function createTransaction(form) {
             if (value.statusCode == 200) {
                 var token = value.body.token
                 request.POST(url + '/transaction')
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .send(form)
-                .end((err, res) => {
-                    if (res.statusCode == 200) {
-                        console.log('Transaction Response\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid Transaction body\n')
-                        resolve(res);
-                    }
-                })
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .send(form)
+                    .end((err, res) => {
+                        if (res.statusCode == 200) {
+                            console.log('Transaction Response\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid Transaction body\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -186,24 +196,24 @@ function retrieveIdTransaction(transaction_id) {
         promiseCreateToken.then((value) => {
             if (value.statusCode == 200) {
                 var token = value.body.token
-                request.GET(url + '/transaction/'+ transaction_id)
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .end((err, res) => {
-                    if (res.statusCode == 200) {
-                        console.log('Transaction record retrieved successfully\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid ID supplied\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 404) {
-                        console.log('Transaction not found\n')
-                        resolve(res);
-                    }
-                })
+                request.GET(url + '/transaction/' + transaction_id)
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .end((err, res) => {
+                        if (res.statusCode == 200) {
+                            console.log('Transaction record retrieved successfully\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid ID supplied\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 404) {
+                            console.log('Transaction not found\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -227,23 +237,23 @@ function deleteIdTransaction(transaction_id) {
             if (value.statusCode == 200) {
                 var token = value.body.token
                 request.DELETE(url + '/transaction/' + transaction_id)
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .end((err, res) => {
-                    if (res.statusCode == 204) {
-                        console.log('Successfully deleted Transaction\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid ID supplied\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 404) {
-                        console.log('Transaction not found\n')
-                        resolve(res);
-                    }
-                })
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .end((err, res) => {
+                        if (res.statusCode == 204) {
+                            console.log('Successfully deleted Transaction\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid ID supplied\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 404) {
+                            console.log('Transaction not found\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -267,23 +277,23 @@ function retrieveSettlements() {
             if (value.statusCode == 200) {
                 var token = value.body.token
                 request.GET(url + '/settlement')
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .end((err, res) => {
-                    if (res.statusCode == 200) {
-                        console.log('Settlement details retrieved successfully\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 404) {
-                        console.log('Settlement not found\n')
-                        resolve(res);
-                    }
-                })
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .end((err, res) => {
+                        if (res.statusCode == 200) {
+                            console.log('Settlement details retrieved successfully\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 404) {
+                            console.log('Settlement not found\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -297,6 +307,14 @@ function retrieveSettlements() {
 }
 
 // Add settlement record
+/*
+var form = {
+    "fk_merchant_id": 0,
+    "fk_branch_id": 0,
+    "fk_transaction_id": 0,
+    "settlement_amount": 0
+}
+*/
 
 module.exports.createSettlement = createSettlement;
 
@@ -307,20 +325,20 @@ function createSettlement(form) {
             if (value.statusCode == 200) {
                 var token = value.body.token
                 request.POST(url + '/settlement')
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .send(form)
-                .end((err, res) => {
-                    if (res.statusCode == 200) {
-                        console.log('Settlement Response\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid Settlement body\n')
-                        resolve(res);
-                    }
-                })
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .send(form)
+                    .end((err, res) => {
+                        if (res.statusCode == 200) {
+                            console.log('Settlement Response\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid Settlement body\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -343,24 +361,24 @@ function retrieveIdSettlement(settlement_id) {
         promiseCreateToken.then((value) => {
             if (value.statusCode == 200) {
                 var token = value.body.token
-                request.GET(url + '/settlement/'+ settlement_id)
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .end((err, res) => {
-                    if (res.statusCode == 200) {
-                        console.log('Settlement record retrieved successfully\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid ID supplied\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 404) {
-                        console.log('Settlement not found\n')
-                        resolve(res);
-                    }
-                })
+                request.GET(url + '/settlement/' + settlement_id)
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .end((err, res) => {
+                        if (res.statusCode == 200) {
+                            console.log('Settlement record retrieved successfully\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid ID supplied\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 404) {
+                            console.log('Settlement not found\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -373,7 +391,15 @@ function retrieveIdSettlement(settlement_id) {
     });
 }
 
-// Update a settlement record
+// Update a settlement record // ? why need this
+/*
+var form = {
+    "fk_merchant_id": 0,
+    "fk_branch_id": 0,
+    "fk_transaction_id": 0,
+    "settlement_amount": 0
+  }
+  */
 
 module.exports.updateIdSettlement = updateIdSettlement;
 
@@ -384,20 +410,20 @@ function updateIdSettlement(settlement_id, form) {
             if (value.statusCode == 200) {
                 var token = value.body.token
                 request.PUT(url + '/settlement/' + settlement_id)
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .send(form)
-                .end((err, res) => {
-                    if (res.statusCode == 200) {
-                        console.log('Updated settlement\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid Settlement body\n')
-                        resolve(res);
-                    }
-                })
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .send(form)
+                    .end((err, res) => {
+                        if (res.statusCode == 200) {
+                            console.log('Updated settlement\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid Settlement body\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -421,23 +447,23 @@ function deleteIdSettlement(settlement_id) {
             if (value.statusCode == 200) {
                 var token = value.body.token
                 request.DELETE(url + '/settlement/' + settlement_id)
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .end((err, res) => {
-                    if (res.statusCode == 204) {
-                        console.log('Successfully deleted Settlement\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid ID supplied\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 404) {
-                        console.log('Settlement not found\n')
-                        resolve(res);
-                    }
-                })
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .end((err, res) => {
+                        if (res.statusCode == 204) {
+                            console.log('Successfully deleted Settlement\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid ID supplied\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 404) {
+                            console.log('Settlement not found\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -451,6 +477,11 @@ function deleteIdSettlement(settlement_id) {
 }
 
 // Update an completed status
+/*
+var form = {
+    "settlement_id": 0
+}
+*/
 
 module.exports.confirmSettlement = confirmSettlement;
 
@@ -461,20 +492,20 @@ function confirmSettlement(settlement_id) {
             if (value.statusCode == 200) {
                 var token = value.body.token
                 request.PUT(url + '/settlement/completed')
-                .set('Content-Type', 'application/json')
-                .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + token)
-                .send({ "settlement_id" : `${settlement_id}`}) // check with caleb
-                .end((err, res) => {
-                    if (res.statusCode == 200) {
-                        console.log('Updated settlement\n')
-                        resolve(res);
-                    }
-                    else if (res.statusCode == 400) {
-                        console.log('Invalid settlement\n')
-                        resolve(res);
-                    }
-                })
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .send({ "settlement_id": settlement_id }) // "settlement_id" : `${settlement_id}`
+                    .end((err, res) => {
+                        if (res.statusCode == 200) {
+                            console.log('Updated settlement\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Invalid settlement\n')
+                            resolve(res);
+                        }
+                    })
             }
             else if (value.statusCode == 401) {
                 resolve("Unauthorized");
@@ -496,6 +527,6 @@ var form = {
     "fk_branch_id": 0,
     "fk_transaction_id": 0,
     "settlement_amount": 0
-  }
+}
 
 // .send({primary_key: `${arg1}`}, {order_id: `${arg2}`})
