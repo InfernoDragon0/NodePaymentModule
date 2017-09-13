@@ -234,7 +234,7 @@ function addTransaction2db(data) {
         }
     });
 }
-function insertTransaction(customer_id, merchant_id, btTransaction_id, datetime, amount, order_id) {
+function addTransaction2db(customer_id, merchant_id, btTransaction_id, datetime, amount, order_id) {
     return new Promise((resolve, reject) => {
         client.queryDocuments(collectionUrltransactionDetail,
             "Select * from c").toArray((err, results) => {
