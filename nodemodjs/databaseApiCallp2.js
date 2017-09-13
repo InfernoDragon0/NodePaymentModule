@@ -518,15 +518,3 @@ function confirmSettlement(settlement_id) {
     });
 }
 
-
-
-
-
-var form = {
-    "fk_merchant_id": 0,
-    "fk_branch_id": 0,
-    "fk_transaction_id": 0,
-    "settlement_amount": 0
-}
-
-// .send({primary_key: `${arg1}`}, {order_id: `${arg2}`})
