@@ -1,4 +1,3 @@
-
 var phase1 = require ('./phase1.js');
 
 var promiseRetrieveUser = phase1.retrieveUser(username);

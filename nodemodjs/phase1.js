@@ -1,3 +1,5 @@
+var request = require('request');
+
 module.exports.retrieveUser = retrieveUser;
 
 //method #1
