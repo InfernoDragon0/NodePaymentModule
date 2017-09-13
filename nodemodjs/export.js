@@ -25,7 +25,7 @@ promiseRetrieveUser.then((value) => {
         else {
             res.send("Invalid username to retrieve customer details");
         }
-    }).catch(err)
+    })
 
 // method #2
 
@@ -51,7 +51,7 @@ promiseRetrieveIdUser.then((value) => {
     else {
         res.send("Invalid id to retrieve customer details");
     }
-}).catch(err)
+})
 
 
 //insert braintree account
@@ -75,7 +75,7 @@ promiseRetrieveIdBraintree.then((value) => {
     else {
         res.send("Invalid id to retrieve braintree details");
     }
-}).catch(err)
+})
 
 // insert transactions
 
@@ -104,7 +104,7 @@ promiseRetrieveIdBraintree.then((value) => {
         else {
             res.send("Invalid id to retrieve wallet information");
         }
-    }).catch(err)
+    })
 
 // top up wallet
 

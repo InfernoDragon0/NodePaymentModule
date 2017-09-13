@@ -44,7 +44,6 @@ function retrieveIdUser(user_id) {
 //         {
 //             form:
 //             {
-//                 "$class": "org.acme.jenetwork.User",
 //                 "user_id": user_id,
 //                 "first_name": first_name,
 //                 "last_name": last_name,
@@ -68,7 +67,6 @@ function insertUser(username, first_name, last_name, email, password, mobile_num
         {
             form:
             {
-                "$class": "org.acme.jenetwork.User",
                 "first_name": first_name,
                 "last_name": last_name,
                 "email": email,
@@ -92,7 +90,6 @@ function insertUser(username, first_name, last_name, email, password, mobile_num
 //         {
 //             form:
 //             {
-//                 "$class": "org.acme.jenetwork.User",
 //                 "user_id": user_id,
 //                 "first_name": first_name,
 //                 "last_name": last_name,
@@ -118,7 +115,6 @@ function modifyUser(user_id, username, first_name, last_name, email, password, m
         {
             form:
             {
-                "$class": "org.acme.jenetwork.User",
                 "first_name": first_name,
                 "last_name": last_name,
                 "email": email,
@@ -144,7 +140,6 @@ function modifyUser(user_id, username, first_name, last_name, email, password, m
 //         {
 //             form:
 //             {
-//                 "$class": "org.acme.jenetwork.Braintree",
 //                 "braintree_user_id": braintree_user_id,
 //                 "fk_user_id": fk_user_id,
 //                 "braintree_id": braintree_id,
@@ -168,7 +163,6 @@ function insertBraintree(braintree_user_id, fk_user_id, braintree_token) {
         {
             form:
             {
-                "$class": "org.acme.jenetwork.Braintree",
                 "braintree_user_id": braintree_user_id,
                 "fk_user_id": fk_user_id,
                 "braintree_token": braintree_token
@@ -208,7 +202,6 @@ function retrieveIdBraintree(fk_user_id) {
 //         {
 //             form:
 //             {
-//                 "$class": "org.acme.jenetwork.Transaction",
 //                 "transaction_id": transaction_id,
 //                 "fk_user_id": fk_user_id,
 //                 "fk_merchant_id": fk_merchant_id,
@@ -236,7 +229,6 @@ function insertTransaction( fk_user_id, fk_merchant_id, fk_branch_id, braintree_
         {
             form:
             {
-                "$class": "org.acme.jenetwork.Transaction",
                 "fk_user_id": fk_user_id,
                 "fk_merchant_id": fk_merchant_id,
                 "fk_branch_id": fk_branch_id,
@@ -262,7 +254,6 @@ function updateSuccessTransaction(transaction_id, braintree_transaction_id, tran
         {
             form:
             {
-                "$class": "org.acme.jenetwork.Transaction",
                 "braintree_transaction_id": braintree_transaction_id,
                 "transaction_type": transaction_type
             }
@@ -284,7 +275,6 @@ function updateSuccessTransaction(transaction_id, braintree_transaction_id, tran
 //         {
 //             form:
 //             {
-//                 "$class": "org.acme.jenetwork.Transaction",
 //                 "modified_at": modified_at,
 //                 "transaction_amount": transaction_amount,
 //                 "transaction_type": transaction_type
@@ -307,7 +297,6 @@ function updateStatusTransaction(transaction_id, transaction_amount, transaction
         {
             form:
             {
-                "$class": "org.acme.jenetwork.Transaction",
                 "transaction_amount": transaction_amount,
                 "transaction_type": transaction_type
             }
@@ -347,7 +336,6 @@ function topupWallet(wallet_id, wallet_amount) {
         {
             form:
             {
-                "$class": "org.acme.jenetwork.Wallet",
                 "wallet_amount" : wallet_amount
             }
         }, function (error, response, body) {
