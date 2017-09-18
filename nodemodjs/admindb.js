@@ -12,15 +12,14 @@ function RetrieveTransactions() {
         if (value.statusCode == 200) {
             console.log(value.body) // for checking
             resolve(value.body)
-
         } else if (value.statusCode == 400) {
-            console.log(value.body.message)
-            resolve(value.body.message)
+            console.log(value.message)
+            resolve(value.message)
         } else if (value.statusCode == 404) {
-            console.log(value.body.message)
-            resolve(value.body.message)
+            console.log(value.message)
+            resolve(value.message)
         } else if (value == "Unauthorized") {
-            res.send("Unauthorized User")
+            resolve("Unauthorized User")
         } else {
             console.log(value)
             resolve(value)
@@ -71,40 +70,49 @@ function RetrieveUnpaid() {
 
         promiseRetrieveTransactions.then((value) => {
             if (value.statusCode == 200) {
-                console.log(value.body + "\n-- for checking\n") // for checking
-                var arrayId = []
-                var arrayJson = []
-    
-                for (var i = 0; i< value.body.length; i ++){
-    
-                    if (value.body[i].transaction_type == 1 || value.body[i].transaction_type == 2) {
-                        arrayId.push(value.body[i].transaction_id)
+                    var arrayJson = [];
+                    for (var i = 0; i< value.body.length; i++){
+                    if ((value.body[i].transaction_type == 1 && value.body[i].transaction_complete == false )||( value.body[i].transaction_type == 2 && value.body[i].transaction_complete == false)) {
+                        arrayJson.push(value.body[i])
                     }
-    
-                    var promiseRetrieveSettlements = api.retrieveSettlements();
-    
-                    promiseRetrieveSettlements.then((value)=>{
-                        if (value.statusCode == 200) {
-                            console.log('Settlement details retrieved successfully\n')
-                            for(var a = 0; a < value.body.length ; a ++){
-                                for(var b = 0; b < value.body.length ; b ++){
-                                if(value.body[a].fk_transaction_id != arrayId[a]){ // will return undefined
-                                    arrayJson.push(value.body[a])
-                                }
-                            }
-                        }
-                            resolve(arrayJson); // send rows of unpaid transactions that are not settled
-                        }
-                        else if (value.statusCode == 400) {
-                            console.log('Invalid\n')
-                            resolve(value.body.message);
-                        }
-                        else if (value.statusCode == 404) {
-                            console.log('Settlement not found\n')
-                            resolve(value.body.message);
-                        }
-                    })
                 }
+                    console.log(arrayJson);
+                    resolve(arrayJson); // send rows of unpaid transactions that are not settled
+                    
+            } else if (value.statusCode == 400) {
+                console.log("Step 1: Invalid\n")
+                resolve(value.message)
+            } else if (value.statusCode == 404) {
+                console.log("Step 1: Transaction not found\n")
+                resolve(value.message)
+            } else if (value == "Unauthorized") {
+                resolve("Unauthorized User")
+            } else {
+                console.log(value)
+                resolve(value)
+            }
+        })
+
+    }) // close promise
+};
+
+
+// retrieve paid transactions 
+
+function RetrievePaid() {
+    return new Promise((resolve, reject) => {
+        var promiseRetrieveTransactions = api.retrieveTransactions();
+
+        promiseRetrieveTransactions.then((value) => {
+            if (value.statusCode == 200) {
+                var arrayJson = [];
+                for (var i = 0; i < value.body.length; i++) {
+                    if (value.body[i].transaction_complete == true) {
+                        arrayJson.push(value.body[i]);
+                    }
+                }
+                console.log(arrayJson);
+                resolve(arrayJson);
 
             } else if (value.statusCode == 400) {
                 console.log(value.message)
@@ -123,83 +131,29 @@ function RetrieveUnpaid() {
     }) // close promise
 };
 
+// retrieve all succesful transactions
 
-// retrieve paid transactions // old
-
-// function RetrievePaid() {
-//     return new Promise((resolve, reject) => {
-//         var promiseRetrieveTransactions = api.retrieveTransactions();
-
-//         promiseRetrieveTransactions.then((value) => {
-//             if (value.statusCode == 200) {
-//                 var arrayJson = []
-//                 for (var i = 0; i < value.body.length; i++) {
-//                     if (value.body[i].transaction_type == 6) {
-//                         arrayJson.push(value.body[i]);
-//                     }
-//                 }
-//                 console.log(arrayJson);
-//                 resolve(arrayJson);
-
-//             } else if (value.statusCode == 400) {
-//                 console.log(value.body.message)
-//                 resolve(value.body.message)
-//             } else if (value.statusCode == 404) {
-//                 console.log(value.body.message)
-//                 resolve(value.body.message)
-//             } else if (value == "Unauthorized") {
-//                 resolve("Unauthorized User")
-//             } else {
-//                 console.log(value)
-//                 resolve(value)
-//             }
-//         })
-
-//     }) // close promise
-// };
-
-// retrieve paid transactions // cant be used
-
-function RetrievePaid() {
+function RetrieveSuccess() {
     return new Promise((resolve, reject) => {
         var promiseRetrieveTransactions = api.retrieveTransactions();
 
         promiseRetrieveTransactions.then((value) => {
             if (value.statusCode == 200) {
-                arrayId = [];
-
-                for (var a = 0; a < value.body.length; a++){
-                    arrayId.push(value.body[a].transaction_id)
+                var arrayJson = [];
+                for (var i = 0; i < value.body.length; i++) {
+                    if (value.body[i].transaction_type == 1 && value.body[i].transaction_complete == false) {
+                        arrayJson.push(value.body[i]);
+                    }
                 }
-
-                promise.RetrieveSettlements = api.retrieveSettlements();
-                RetrieveSettlements.then((value)=>{
-                    if (value.statusCode == 200) {
-                        console.log('Settlement details retrieved successfully\n')
-                        var arrayJson = []
-                        for (var b=0; b< value.body.length; b++){
-                            if(value.body[b].fk_transaction_id==arrayId[b]){
-                                // need to check transaction id array against settlement array // alternative is to modify and add transaction check on
-                            }
-                        }
-
-                    }
-                    else if (value.statusCode == 400) {
-                        console.log('Invalid\n')
-                        resolve(value.body.message);
-                    }
-                    else if (value.statusCode == 404) {
-                        console.log('Settlement not found\n')
-                        resolve(value.body.message);
-                    }
-                })
+                console.log(arrayJson);
+                resolve(arrayJson);
 
             } else if (value.statusCode == 400) {
-                console.log(value.body.message)
-                resolve(value.body.message)
+                console.log(value.message)
+                resolve(value.message)
             } else if (value.statusCode == 404) {
-                console.log(value.body.message)
-                resolve(value.body.message)
+                console.log(value.message)
+                resolve(value.message)
             } else if (value == "Unauthorized") {
                 resolve("Unauthorized User")
             } else {
@@ -211,20 +165,131 @@ function RetrievePaid() {
     }) // close promise
 };
 
-function RetrievePaid() {
+// retrieve all refunded transactions
+
+function RetrieveRefund() {
     return new Promise((resolve, reject) => {
         var promiseRetrieveTransactions = api.retrieveTransactions();
 
         promiseRetrieveTransactions.then((value) => {
             if (value.statusCode == 200) {
-                
+                var arrayJson = [];
+                for (var i = 0; i < value.body.length; i++) {
+                    if (value.body[i].transaction_type == 3 && value.body[i].transaction_complete == true) {
+                        arrayJson.push(value.body[i]);
+                    }
+                }
+                console.log(arrayJson);
+                resolve(arrayJson);
 
             } else if (value.statusCode == 400) {
-                console.log(value.body.message)
-                resolve(value.body.message)
+                console.log(value.message)
+                resolve(value.message)
             } else if (value.statusCode == 404) {
-                console.log(value.body.message)
-                resolve(value.body.message)
+                console.log(value.message)
+                resolve(value.message)
+            } else if (value == "Unauthorized") {
+                resolve("Unauthorized User")
+            } else {
+                console.log(value)
+                resolve(value)
+            }
+        })
+
+    }) // close promise
+};
+
+// retrieve all chargebacked transactions
+
+function RetrieveChargeback() {
+    return new Promise((resolve, reject) => {
+        var promiseRetrieveTransactions = api.retrieveTransactions();
+
+        promiseRetrieveTransactions.then((value) => {
+            if (value.statusCode == 200) {
+                var arrayJson = [];
+                for (var i = 0; i < value.body.length; i++) {
+                    if (value.body[i].transaction_type == 2 && value.body[i].transaction_complete == true) {
+                        arrayJson.push(value.body[i]);
+                    }
+                }
+                console.log(arrayJson);
+                resolve(arrayJson);
+
+            } else if (value.statusCode == 400) {
+                console.log(value.message)
+                resolve(value.message)
+            } else if (value.statusCode == 404) {
+                console.log(value.message)
+                resolve(value.message)
+            } else if (value == "Unauthorized") {
+                resolve("Unauthorized User")
+            } else {
+                console.log(value)
+                resolve(value)
+            }
+        })
+
+    }) // close promise
+};
+
+// retrieve all wallet top-up transactions
+
+function RetrieveTopup() {
+    return new Promise((resolve, reject) => {
+        var promiseRetrieveTransactions = api.retrieveTransactions();
+
+        promiseRetrieveTransactions.then((value) => {
+            if (value.statusCode == 200) {
+                var arrayJson = [];
+                for (var i = 0; i < value.body.length; i++) {
+                    if (value.body[i].transaction_type == 4 && value.body[i].transaction_complete == false) { // check if need to be false for transaction complete
+                        arrayJson.push(value.body[i]);
+                    }
+                }
+                console.log(arrayJson);
+                resolve(arrayJson);
+
+            } else if (value.statusCode == 400) {
+                console.log(value.message)
+                resolve(value.message)
+            } else if (value.statusCode == 404) {
+                console.log(value.message)
+                resolve(value.message)
+            } else if (value == "Unauthorized") {
+                resolve("Unauthorized User")
+            } else {
+                console.log(value)
+                resolve(value)
+            }
+        })
+
+    }) // close promise
+};
+
+// retrieve all wallet payment transactions
+
+function RetrievePayment() {
+    return new Promise((resolve, reject) => {
+        var promiseRetrieveTransactions = api.retrieveTransactions();
+
+        promiseRetrieveTransactions.then((value) => {
+            if (value.statusCode == 200) {
+                var arrayJson = [];
+                for (var i = 0; i < value.body.length; i++) {
+                    if (value.body[i].transaction_type == 5 && value.body[i].transaction_complete == false) {
+                        arrayJson.push(value.body[i]);
+                    }
+                }
+                console.log(arrayJson);
+                resolve(arrayJson);
+
+            } else if (value.statusCode == 400) {
+                console.log(value.message)
+                resolve(value.message)
+            } else if (value.statusCode == 404) {
+                console.log(value.message)
+                resolve(value.message)
             } else if (value == "Unauthorized") {
                 resolve("Unauthorized User")
             } else {
@@ -286,8 +351,8 @@ function FullRefund(transactionId) {
                                             console.log("Step 4: Fail to insert refund to our database\n")
                                             resolve("Step 4: Fail to insert refund to our database\n");
                                         } else {
-                                            console.log(err)
-                                            resolve(err);
+                                            console.log(value)
+                                            resolve(value);
                                         }
                                     })
                                 }
@@ -295,8 +360,8 @@ function FullRefund(transactionId) {
                             })
 
                         } else if (value.success == false) {
-                            console.log(value.body.message)
-                            resolve(value.body.message);
+                            console.log(value.message)
+                            resolve(value.message);
                         }
                     });
 
@@ -309,10 +374,10 @@ function FullRefund(transactionId) {
                 }
             } else if (value.statusCode == 400) {
                 console.log("Error retrieving from our database\n")
-                resolve(value.body.message)
+                resolve(value.message)
             } else if (value.statusCode == 404) {
                 console.log("Error retrieving from our database\n")
-                resolve(value.body.message)
+                resolve(value.message)
             } else if (value == "Unauthorized") {
                 resolve("Unauthorized User")
             } else {
@@ -368,11 +433,11 @@ function partialRefund(transactionId, refundAmount) {
                                         // console.log(value.body);
                                         if (value.statusCode == 200) {
                                             console.log("Step 4 : Inserted refund to our database\n")
-                                            resolve(value.body.message)
+                                            resolve(value.message)
                                         }
                                         else if (value.statusCode == 400) {
                                             console.log("Step 4: Fail to insert refund to our database\n")
-                                            resolve(value.body.message)
+                                            resolve(value.message)
                                         } else {
                                             console.log(value)
                                             resolve(value)
@@ -384,8 +449,8 @@ function partialRefund(transactionId, refundAmount) {
                             })
 
                         } else if (value.success == false) {
-                            console.log(value.body.message)
-                            resolve(value.body.message);
+                            console.log(value.message)
+                            resolve(value.message);
                         }
                     });
 
@@ -396,10 +461,10 @@ function partialRefund(transactionId, refundAmount) {
                 }
             } else if (value.statusCode == 400) {
                 console.log("Error retrieving from our database\n")
-                resolve(value.body.message)
+                resolve(value.message)
             } else if (value.statusCode == 404) {
                 console.log("Error retrieving from our database\n")
-                resolve(value.body.message)
+                resolve(value.message)
             } else if (value == "Unauthorized") {
                 resolve("Unauthorized User")
             } else {
@@ -453,24 +518,24 @@ function insertSettlement(transactionId) {
                                     resolve(value.body)
                                 }else{
                                     console.log('Failed to insert settlement for transaction\n')
-                                    resolve(value.body.message)
+                                    resolve(value.message)
                                 }
                             })
 
                         }
                         else if (value.statusCode == 400) {
                             console.log('Invalid ID supplied\n')
-                            resolve(value.body.message);
+                            resolve(value.message);
                         }
                         else if (value.statusCode == 404) {
                             console.log('Transaction not found\n')
-                            resolve(value.body.message);
+                            resolve(value.message);
                         }
                     })
                 }
             } else if (value.statusCode == 400) {
                 console.log('fail to connect to settlement table\n')
-                resolve(value.body.message)
+                resolve(value.message)
             } else {
                 resolve(value)
             }
@@ -526,9 +591,9 @@ function RetrieveRefund() {
                 resolve(arrayJson);
 
             } else if (value.statusCode == 400) {
-                resolve(value.body.message)
+                resolve(value.message)
             } else if (value.statusCode == 404) {
-                resolve(value.body.message)
+                resolve(value.message)
             } else if (value == "Unauthorized") {
                 resolve("Unauthorized User")
             } else {
@@ -558,9 +623,9 @@ function RetrieveChargeback() {
                 resolve(arrayJson);
 
             } else if (value.statusCode == 400) {
-                resolve(value.body.message)
+                resolve(value.message)
             } else if (value.statusCode == 404) {
-                resolve(value.body.message)
+                resolve(value.message)
             } else if (value == "Unauthorized") {
                 resolve("Unauthorized User")
             } else {
@@ -571,7 +636,7 @@ function RetrieveChargeback() {
     }) // close promise
 };
 
-// Calculate earnings of all transaction //? no need
+// Calculate earnings of all transaction 
 
 // var promiseRetrieveTransactions = api.retrieveTransactions();
 
@@ -621,4 +686,10 @@ function RetrieveChargeback() {
 // })
 
 // insert transactions
+
+/* |||||   ||| /|||||||||\ /|||||||||\  |||    ||| /||||||| ||||||||| */
+/* ||||||  ||| |||     |||     |||      |||    ||| |||      |||       */
+/* ||| ||| ||| |||     |||     |||      |||    ||| |||||||| ||||||||| */
+/* |||  |||||| |||     |||     |||      |||    |||      ||| |||       */
+/* |||    |||| \|||||||||/     |||      \||||||||/ |||||||/ ||||||||| */
 

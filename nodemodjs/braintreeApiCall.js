@@ -51,4 +51,3 @@ function btPartialRefund(btTransactionId, refundAmt) {
         });
     // }) // close promise
 };
-
