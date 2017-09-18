@@ -16,6 +16,7 @@
   "dependencies": {
     "async": "^2.5.0",
     "azure-storage": "^2.2.1",
+    "braintree": "^2.3.0",
     "documentdb": "^1.12.0",
     "mongodb": "^2.2.30",
     "mysql": "^2.13.0",
