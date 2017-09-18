@@ -77,7 +77,7 @@ console.log('\n')// leave a space in the console
 //       });
 //     }
 
-createToken();
+// createToken()
 
 function createToken() {
     return new Promise((resolve, reject) => {

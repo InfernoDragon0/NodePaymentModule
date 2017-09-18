@@ -212,7 +212,7 @@ function addRefund(customer_id, merchant_id, btTransaction_id, amount, order_id)
                         'dateOnly': today,
                         'amount': amount,
                         'order_id': order_id,
-                        'transaction_detail': 3
+                        'transaction_detail': 3 // Transaction - Refund ( Braintree ) 
                     });
 
                     resolve(transaction_id);
@@ -265,7 +265,7 @@ function addTransaction2db(customer_id, merchant_id, btTransaction_id, datetime,
                         'dateOnly': today,
                         'amount': amount,
                         'order_id': order_id,
-                        'transaction_detail': 1
+                        'transaction_detail': 1 // transcation pending braintree
                     });
 
                     resolve(transaction_id);
@@ -293,7 +293,7 @@ function paymentSucessful(transaction_id, braintreeID) {
                     }
                     for (let result of results) {
                         console.log("ihi");
-                        result.transaction_detail = 0;
+                        result.transaction_detail = 0; // < transaction sucess
                         result.btTransaction_id = braintreeID;
                         let documentUrl = `${collectionUrltransactionDetail}/docs/${transaction_id}`;
                         client.replaceDocument(documentUrl, result, (err, result) => {
@@ -394,7 +394,7 @@ function insertTransactionWalletTopUp(customer_id, amount, btTransaction_id) {
                         'datetime': datetime,
                         'dateOnly': today,
                         'amount': amount,
-                        'transaction_detail': 5
+                        'transaction_detail': 5 // wallet pay
                     });
                 } else {
                     console.log('Wallet-TopUp')
@@ -408,7 +408,7 @@ function insertTransactionWalletTopUp(customer_id, amount, btTransaction_id) {
                         'datetime': datetime,
                         'dateOnly': today,
                         'amount': amount,
-                        'transaction_detail': 4
+                        'transaction_detail': 4 // wallet top up
                     });
                 };
 
