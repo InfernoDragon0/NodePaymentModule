@@ -60,3 +60,50 @@ promiseRetrieveTransactions.then((value) => {
         res.send(err)
     }
 })
+
+// get branches after login
+
+function getBranch(merchantId){
+    
+        var promiseRetrieveIdMerchant = api.retrieveIdMerchant(merchantId)
+    
+        promiseRetrieveIdMerchant.then((value)=>{
+            if (value == -1){
+                console.log('special errors')
+            }else if (value.statusCode == 401){
+                console.log('Unauthorised')
+            }else if (value.statusCode == 400){
+                console.log(value.message)
+            }else if (value.statusCode == 404){
+                console.log(value.message)
+            }else if (value.statusCode == 200){
+                
+                var promiseRetrieveBranches = api.retrieveBranches();
+    
+                promiseRetrieveBranches.then((value)=>{
+                    if (value == -1){
+                        console.log('special errors')
+                    }else if (value.statusCode == 401){
+                        console.log('Unauthorised')
+                    }else if (value.statusCode == 400){
+                        console.log(value.message)
+                    }else if (value.statusCode == 404){
+                        console.log(value.message)
+                    }else if (value.statusCode == 200){
+                        
+                        var array = []
+                        for (var i = 0; i < value.body.length; i++ ){
+                            if (value.body[i].merchant_id == merchantId){
+                                array.push(value.body[i])
+                            }
+                        }
+                        console.log(array)
+                    }
+                })
+    
+            }
+        })
+    
+    }
+    
+    // getBranch();

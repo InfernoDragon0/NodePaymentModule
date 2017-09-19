@@ -4,6 +4,8 @@ var api = require('./databaseApiCallp2.js')
 
 // response all transaction
 
+module.exports.RetrieveTransactions = RetrieveTransactions();
+
 function RetrieveTransactions() {
     return new Promise((resolve, reject) => {
         var promiseRetrieveTransactions = api.retrieveTransactions();
@@ -23,7 +25,7 @@ function RetrieveTransactions() {
                 resolve(value)
             } else if (value.statusCode == 200) {
                 console.log(value.body) // for checking
-                resolve(value);
+                resolve(value.body);
             } else {
                 console.log('passing on the error message')
                 resolve(value);
@@ -55,7 +57,7 @@ function RetrieveUnpaid() {
             } else if (value.statusCode == 200) {
                 var arrayJson = [];
                 for (var i = 0; i < value.body.length; i++) {
-                    if ((value.body[i].transaction_type == 1 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 2 && value.body[i].transaction_complete == false)) {
+                    if ((value.body[i].transaction_type == 1 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 2 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 5 && value.body[i].transaction_complete == false)) {
                         arrayJson.push(value.body[i])
                     }
                 }
@@ -109,9 +111,9 @@ function RetrievePaid() {
     }) // close promise
 };
 
-// retrieve all succesful transactions
+// retrieve all successful transactions // for refunds
 
-function RetrieveSuccess() {
+function RetrieveSuccessTransaction() {
     return new Promise((resolve, reject) => {
         var promiseRetrieveTransactions = api.retrieveTransactions();
 
@@ -131,7 +133,7 @@ function RetrieveSuccess() {
             } else if (value.statusCode == 200) {
                 var arrayJson = [];
                 for (var i = 0; i < value.body.length; i++) {
-                    if (value.body[i].transaction_type == 1 && value.body[i].transaction_complete == false) {
+                    if ((value.body[i].transaction_type == 1 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 5 && value.body[i].transaction_complete == false)) {
                         arrayJson.push(value.body[i]);
                     }
                 }
@@ -147,9 +149,9 @@ function RetrieveSuccess() {
     }) // close promise
 };
 
-// retrieve all refunded transactions
+// retrieve settled transactions // for chargeback
 
-function RetrieveRefund() {
+function RetrievePaymentTransaction() {
     return new Promise((resolve, reject) => {
         var promiseRetrieveTransactions = api.retrieveTransactions();
 
@@ -169,7 +171,7 @@ function RetrieveRefund() {
             } else if (value.statusCode == 200) {
                 var arrayJson = [];
                 for (var i = 0; i < value.body.length; i++) {
-                    if (value.body[i].transaction_type == 3 && value.body[i].transaction_complete == true) {
+                    if ((value.body[i].transaction_type == 1 && value.body[i].transaction_complete == true) || (value.body[i].transaction_type == 5 && value.body[i].transaction_complete == true)) {
                         arrayJson.push(value.body[i]);
                     }
                 }
@@ -208,44 +210,6 @@ function RetrieveChargeback() {
                 var arrayJson = [];
                 for (var i = 0; i < value.body.length; i++) {
                     if (value.body[i].transaction_type == 2 && value.body[i].transaction_complete == true) {
-                        arrayJson.push(value.body[i]);
-                    }
-                }
-                console.log(arrayJson);
-                resolve(arrayJson);
-
-            } else {
-                console.log('passing on the error message')
-                resolve(value);
-            }
-        })
-
-    }) // close promise
-};
-
-// retrieve all wallet top-up transactions
-
-function RetrieveTopup() {
-    return new Promise((resolve, reject) => {
-        var promiseRetrieveTransactions = api.retrieveTransactions();
-
-        promiseRetrieveTransactions.then((value) => {
-            if (value == -1) {
-                console.log('special errors')
-                resolve(value)
-            } else if (value.statusCode == 401) {
-                console.log(value.message)
-                resolve(value)
-            } else if (value.statusCode == 400) {
-                console.log(value.message)
-                resolve(value)
-            } else if (value.statusCode == 404) {
-                console.log(value.message)
-                resolve(value)
-            } else if (value.statusCode == 200) {
-                var arrayJson = [];
-                for (var i = 0; i < value.body.length; i++) {
-                    if (value.body[i].transaction_type == 4 && value.body[i].transaction_complete == false) { // check if need to be false for transaction complete
                         arrayJson.push(value.body[i]);
                     }
                 }
@@ -320,7 +284,7 @@ function FullRefund(transactionId) {
                 resolve(value)
             } else if (value.statusCode == 200) {
                 console.log("Retrieve transaction from our database successful\n")
-                if (value.body.transaction_type == 1 || value.body.transaction_type == 4) {
+                if (value.body.transaction_type == 1 && value.body.transaction_complete == false) {
 
                     var brainId = value.body.braintree_transaction_id;
                     var userId = value.body.fk_user_id;
@@ -336,7 +300,7 @@ function FullRefund(transactionId) {
 
                             promiseBtSearch.then((value) => {
                                 if (!value) {
-                                    console.log(err)
+                                    resolve(-1)
                                 } else {
                                     console.log("search refundId from bt transaction \n")
 
@@ -353,7 +317,7 @@ function FullRefund(transactionId) {
 
                                     promiseCreateTransaction.then((value) => {
                                         // console.log(value.body);
-                                        if (value.statusCode == 200) {
+                                        if (value.statusCode >= 200 && value.statusCode <= 299) {
                                             console.log('Step 4 : Inserted refund to our database\n')
                                             resolve(value);
                                         }
@@ -375,7 +339,45 @@ function FullRefund(transactionId) {
                         }
                     });
 
-                } else if (value.transaction_type == 3) {
+                } else if (value.body.transaction_type == 5 && value.body.transaction_complete == false) {
+
+                    var brainId = value.body.braintree_transaction_id;
+                    var userId = value.body.fk_user_id;
+                    var merchantId = value.body.fk_merchant_id;
+                    var branchId = value.body.fk_branch_id;
+
+//////////////////////////// Update hyper wallet
+
+                    var form = {
+                        "fk_user_id": userId,
+                        "fk_merchant_id": merchantId,
+                        "fk_branch_id": branchId,
+                        "braintree_transaction_id": value.refundId,
+                        "transaction_amount": value.amount,
+                        "transaction_type": 3
+                    }
+
+                    var promiseCreateTransaction = api.createTransaction(form) // add refund transaction to our database
+
+                    promiseCreateTransaction.then((value) => {
+                        // console.log(value.body);
+                        if (value.statusCode >= 200 && value.statusCode <= 299) {
+                            console.log('Step 4 : Inserted refund to our database\n')
+                            resolve(value);
+                        }
+                        else if (value.statusCode == 400) {
+                            console.log('Step 4: Fail to insert refund to our database\n')
+                            resolve(value);
+                        } else {
+                            console.log('Step 4: Could not establish proper connection with database\n')
+                            resolve(-1);
+                        }
+                    })
+
+////////////////////////////// Update hyperwallet
+
+                }
+                else if (value.transaction_type == 3 || value.transaction_type == 6) {
                     console.log("transaction is already refunded")// transaction has been refunded in the database
                     resolve("transaction is already refunded") // can be resolved as something else
                 } else {
@@ -389,9 +391,6 @@ function FullRefund(transactionId) {
         })
     })
 };
-
-// FullRefund('4ec15667-ca27-495b-2953-08d4fb4cc841')
-
 
 // refund partial transaction
 
@@ -413,7 +412,7 @@ function partialRefund(transactionId, refundAmount) {
                 console.log(value.message)
                 resolve(value)
             } else if (value.statusCode == 200) {
-                if (value.body.transaction_type == 1 || value.body.transaction_type == 4) {
+                if (value.body.transaction_type == 1 && value.body.transaction_complete == false) {
                     // console.log(value.body.braintree_transaction_id)
 
                     var promiseBtPartialRefund = bt.btPartialRefund(value.body.braintree_transaction_id, refundAmount);
@@ -425,7 +424,7 @@ function partialRefund(transactionId, refundAmount) {
 
                             promiseBtSearch.then((value) => {
                                 if (!value) {
-                                    console.log(err)
+                                    resolve(-1)
                                 } else {
                                     console.log("search refundId from bt transaction \n")
 
@@ -445,7 +444,7 @@ function partialRefund(transactionId, refundAmount) {
 
                                     promiseCreateTransaction.then((value) => {
                                         // console.log(value.body);
-                                        if (value.statusCode == 200) {
+                                        if (value.statusCode >= 200 && value.statusCode <= 299) {
                                             console.log("Step 4 : Inserted refund to our database\n")
                                             resolve(value)
                                         }
@@ -468,7 +467,40 @@ function partialRefund(transactionId, refundAmount) {
                         }
                     });
 
-                } else if (value.transaction_type == 3) {
+                }else if (value.body.transaction_type == 5 && value.body.transaction_complete == false) {
+                    // console.log(value.body.braintree_transaction_id)
+
+////////////////// Check if refundable/ Update hyperwallet
+                                    var form = {
+                                        "fk_user_id": userId,
+                                        "fk_merchant_id": merchantId,
+                                        "fk_branch_id": branchId,
+                                        "braintree_transaction_id": value.refundId[length],
+                                        "transaction_amount": refundAmount,
+                                        "transaction_type": 3
+                                    }
+
+                                    var promiseCreateTransaction = api.createTransaction(form) // add refund transaction to our database
+
+                                    promiseCreateTransaction.then((value) => {
+                                        // console.log(value.body);
+                                        if (value.statusCode >= 200 && value.statusCode <= 299) {
+                                            console.log("Step 4 : Inserted refund to our database\n")
+                                            resolve(value)
+                                        }
+                                        else if (value.statusCode == 400) {
+                                            console.log("Step 4: Fail to insert refund to our database\n")
+                                            resolve(value)
+                                        } else {
+                                            console.log('Step 4: Could not establish proper connection with database\n')
+                                            resolve(-1);
+                                        }
+                                    })
+
+//////////////////////////////// Check if refundable/ Update hyperwallet
+
+                }
+                 else if (value.transaction_type == 3) {
                     resolve("transaction is already refunded")
                 } else {
                     resolve("transaction cannot be refunded")// either chargeback, or already completed -- if so, chargeback
@@ -510,10 +542,10 @@ function insertSettlement(transactionId) {
                         break;
                     }
                 }
-                if (arg === true) {
+                if (arg == true) {
                     console.log("this transaction is already settled\n")
                     resolve("this transaction is already settled\n") // can be changed
-                } else if (arg === false) {
+                } else if (arg == false) {
                     var promiseRetrieveIdTransaction = api.retrieveIdTransaction(transactionId); // search for transaction detail from our transaction database
 
                     promiseRetrieveIdTransaction.then((value) => {
@@ -543,9 +575,24 @@ function insertSettlement(transactionId) {
                             var promiseCreateSettlement = api.createSettlement(form); // create settlement record
 
                             promiseCreateSettlement.then((value) => {
-                                if (value.statusCode == 200) {
+                                if (value.statusCode >= 200 && value.statusCode <= 299) {
                                     console.log('Insert settlement record successful\n')
-                                    resolve(value)
+
+                                    var form1 = {
+                                        "transaction_id": transactionId
+                                    }
+
+                                    var promiseConfirmTransaction = api.confirmTransaction(form1);
+                                    promiseConfirmTransaction.then((value)=>{
+                                        if (value == -1) {
+                                            console.log('special errors')
+                                            resolve(value)
+                                        } else if (value.statusCode == 200) {
+                                            resolve(value);
+                                        }else{
+                                            resolve(-1)
+                                        }
+                                    })
                                 } else if (value.statusCode == 400) {
                                     console.log('Failed to insert settlement for transaction\n')
                                     resolve(value)
@@ -640,41 +687,6 @@ function RetrieveRefunded() {
                 }
                 resolve(arrayJson);
 
-            } else {
-                console.log('passing on the error message')
-                resolve(value);
-            }
-        })
-    }) // close promise
-};
-
-// retrieve chargeback transactions
-
-function RetrieveChargeback() {
-    return new Promise((resolve, reject) => {
-        var promiseRetrieveTransactions = api.retrieveTransactions();
-
-        promiseRetrieveTransactions.then((value) => {
-            if (value == -1) {
-                console.log('special errors')
-                resolve(value)
-            } else if (value.statusCode == 401) {
-                console.log(value.message)
-                resolve(value)
-            } else if (value.statusCode == 400) {
-                console.log(value.message)
-                resolve(value)
-            } else if (value.statusCode == 404) {
-                console.log(value.message)
-                resolve(value)
-            } else if (value.statusCode == 200) {
-                var arrayJson = []
-                for (var i = 0; i < value.body.length; i++) {
-                    if (value.body.transaction_type == 2 && value.body[i].transaction_complete == true) {
-                        arrayJson.push(value[i]);
-                    }
-                }
-                resolve(arrayJson);
             } else {
                 console.log('passing on the error message')
                 resolve(value);
@@ -923,6 +935,73 @@ function getMerchantCompleted(date1, date2, merchantId) {
     }) // close promise
 }
 
+function insertChargeback(transactionId){
+    new Promise ((resolve, reject)=>{
+
+        var promiseRetrieveIdTransaction = api.retrieveIdTransaction(transactionId);
+
+        promiseRetrieveIdTransaction.then((value)=>{
+            if (value == -1) {
+                console.log('special errors')
+                resolve(value)
+            } else if (value.statusCode == 401) {
+                console.log(value.message)
+                resolve(value)
+            } else if (value.statusCode == 400) {
+                console.log(value.message)
+                resolve(value)
+            } else if (value.statusCode == 404) {
+                console.log(value.message)
+                resolve(value)
+            } else if (value.statusCode == 200) {
+
+                if(value.body.transaction_type == 1 && value.body.transaction_complete == true){
+                    console.log('transaction can be chargedback')
+
+                    var form = {
+
+                    }
+
+                    var promiseCreateSettlement = api.createSettlement(form);
+                    promiseCreateSettlement.then((value)=>{
+                        if (value == -1) {
+                            console.log('special errors')
+                            resolve(value)
+                        } else if (value.statusCode == 401) {
+                            console.log(value.message)
+                            resolve(value)
+                        } else if (value.statusCode == 400) {
+                            console.log(value.message)
+                            resolve(value)
+                        } else if (value.statusCode == 404) {
+                            console.log(value.message)
+                            resolve(value)
+                        } else if (value.statusCode >= 200 && value.statusCode <= 299) {
+                            console.log(value.message)
+                            resolve(value)
+                        }else{
+                            console.log('not properly connected to database')
+                            resolve (-1)
+                        }
+                    })
+
+                }else if (value.body.transaction_complete == false){
+                    console.log('transaction has not been paid and cannot be refunded')
+                    resolve(value)
+                }else{
+                    console.log('transaction cannot be chargebacked')
+                    resolve(value)
+                }
+
+            }else {
+                console.log('passing on the error message')
+                resolve(value);
+            }
+        })
+
+    })// close promise
+};
+
 /* |||||   ||| /|||||||||\ /|||||||||\  |||    ||| /||||||| ||||||||| */
 /* ||||||  ||| |||     |||     |||      |||    ||| |||      |||       */
 /* ||| ||| ||| |||     |||     |||      |||    ||| |||||||| ||||||||| */
@@ -939,16 +1018,16 @@ function getEarnings() {
         return new Promise((resolve, reject) => {
             if (value == -1) {
                 console.log('special errors')
-                resolve (value)
+                resolve(value)
             } else if (value.statusCode == 401) {
                 console.log(value.message)
-                resolve (value)
+                resolve(value)
             } else if (value.statusCode == 400) {
                 console.log(value.message)
-                resolve (value)
+                resolve(value)
             } else if (value.statusCode == 404) {
                 console.log(value.message)
-                resolve (value)
+                resolve(value)
             } else if (value.statusCode == 200) {
                 var holdAmt = 0;
                 var chargebackAmt = 0;
@@ -1004,16 +1083,16 @@ function getEarnings() {
         return new Promise((resolve, reject) => {
             if (value == -1) {
                 console.log('special errors')
-                resolve (value)
+                resolve(value)
             } else if (value.statusCode == 401) {
                 console.log(value.message)
-                resolve (value)
+                resolve(value)
             } else if (value.statusCode == 400) {
                 console.log(value.message)
-                resolve (value)
+                resolve(value)
             } else if (value.statusCode == 404) {
                 console.log(value.message)
-                resolve (value)
+                resolve(value)
             } else if (value.statusCode == 200) {
                 var holdAmt = 0;
                 var chargebackAmt = 0;
@@ -1067,36 +1146,42 @@ function getEarnings() {
 /* |||    |||| \|||||||||/     |||      \||||||||/ |||||||/ ||||||||| */
 
 
-    // retrieve unpaid transactions //old
+// retrieve all wallet top-up transactions
+// not needed
 
-// function RetrieveUnpaid() {
+// function RetrieveTopup() {
 //     return new Promise((resolve, reject) => {
 //         var promiseRetrieveTransactions = api.retrieveTransactions();
 
 //         promiseRetrieveTransactions.then((value) => {
-//             if (value.statusCode == 200) {
-//                 var arrayJson = []
+//             if (value == -1) {
+//                 console.log('special errors')
+//                 resolve(value)
+//             } else if (value.statusCode == 401) {
+//                 console.log(value.message)
+//                 resolve(value)
+//             } else if (value.statusCode == 400) {
+//                 console.log(value.message)
+//                 resolve(value)
+//             } else if (value.statusCode == 404) {
+//                 console.log(value.message)
+//                 resolve(value)
+//             } else if (value.statusCode == 200) {
+//                 var arrayJson = [];
 //                 for (var i = 0; i < value.body.length; i++) {
-//                     if (value.body[i].transaction_type == 1 || value.body[i].transaction_type == 2) {
+//                     if (value.body[i].transaction_type == 4 && value.body[i].transaction_complete == false) { // check if need to be false for transaction complete
 //                         arrayJson.push(value.body[i]);
 //                     }
 //                 }
 //                 console.log(arrayJson);
 //                 resolve(arrayJson);
 
-//             } else if (value.statusCode == 400) {
-//                 console.log(value.message)
-//                 resolve(value.message)
-//             } else if (value.statusCode == 404) {
-//                 console.log(value.message)
-//                 resolve(value.message)
-//             } else if (value == "Unauthorized") {
-//                 resolve("Unauthorized User")
 //             } else {
-//     console.log(value)
-//     resolve(value)
-// }
+//                 console.log('passing on the error message')
+//                 resolve(value);
+//             }
 //         })
 
 //     }) // close promise
 // };
+
