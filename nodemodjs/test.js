@@ -131,11 +131,11 @@ function getBranch(merchantId){
             console.log('special errors')
         }else if (value.statusCode == 401){
             console.log('Unauthorised')
-        }else if (value.statusCOde == 400){
+        }else if (value.statusCode == 400){
             console.log(value.message)
-        }else if (value.statusCOde == 404){
+        }else if (value.statusCode == 404){
             console.log(value.message)
-        }else if (value.statusCOde == 200){
+        }else if (value.statusCode == 200){
             
             var promiseRetrieveBranches = api.retrieveBranches();
 
@@ -144,11 +144,11 @@ function getBranch(merchantId){
                     console.log('special errors')
                 }else if (value.statusCode == 401){
                     console.log('Unauthorised')
-                }else if (value.statusCOde == 400){
+                }else if (value.statusCode == 400){
                     console.log(value.message)
-                }else if (value.statusCOde == 404){
+                }else if (value.statusCode == 404){
                     console.log(value.message)
-                }else if (value.statusCOde == 200){
+                }else if (value.statusCode == 200){
                     
                     var array = []
                     for (var i = 0; i < value.body.length; i++ ){
