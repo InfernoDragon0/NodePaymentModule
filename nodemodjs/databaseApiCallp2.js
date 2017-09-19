@@ -11,15 +11,15 @@ function createToken() {
             .send({ "primary_key": primary_key })
             .end((err, res) => {
                 if (res.statusCode == 200) {
-                    console.log('Successful\n')
+                    console.log('\nSuccessful\n')
                     resolve(res);
                 }
                 else if (res.statusCode == 401) {
-                    console.log('Unauthorized\n')
+                    console.log('\nUnauthorized\n')
                     resolve(res);
                 }
                 else {
-                    console.log('Could not establish proper connection with database\n')
+                    console.log('\nCould not establish proper connection with database\n')
                     resolve(-1)
                 }
             })
@@ -38,7 +38,7 @@ function retrieveTransactions() {
         promiseCreateToken.then((value) => {
 
             if (value.statusCode == 200) {
-
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
 
                 request.get(url + '/transaction')
@@ -46,7 +46,7 @@ function retrieveTransactions() {
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Transaction details retrieved successfully\n')
                             resolve(res);
                         }
@@ -96,16 +96,20 @@ function createTransaction(form) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.post(url + '/transaction')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token) // step 1
+                    .set('Authorization', 'Bearer ' + token) 
                     .send(form)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Transaction Response\n')
+                            console.log(res.body)
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
@@ -140,14 +144,17 @@ function retrieveIdTransaction(transaction_id) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.get(url + '/transaction/' + transaction_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Transaction record retrieved successfully\n')
                             resolve(res);
                         }
@@ -186,14 +193,17 @@ function deleteIdTransaction(transaction_id) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.delete(url + '/transaction/' + transaction_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
-                        if (res.statusCode == 204) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Successfully deleted Transaction\n')
                             resolve(res);
                         }
@@ -232,14 +242,17 @@ function retrieveSettlements() {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.get(url + '/settlement')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Settlement details retrieved successfully\n')
                             resolve(res);
                         }
@@ -287,15 +300,18 @@ function createSettlement(form) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.post(url + '/settlement')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .send(form)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Settlement Response\n')
                             resolve(res);
                         }
@@ -330,14 +346,17 @@ function retrieveIdSettlement(settlement_id) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.get(url + '/settlement/' + settlement_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Settlement record retrieved successfully\n')
                             resolve(res);
                         }
@@ -376,14 +395,17 @@ function deleteIdSettlement(settlement_id) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.delete(url + '/settlement/' + settlement_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
-                        if (res.statusCode == 204) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Successfully deleted Settlement\n')
                             resolve(res);
                         }
@@ -428,15 +450,18 @@ function confirmTransaction(transaction_id) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.put(url + '/transaction/completed')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .send({ "transaction_id": transaction_id }) // "settlement_id" : `${settlement_id}`
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Updated transaction\n')
                             resolve(res);
                         }
@@ -486,15 +511,18 @@ function createMerchant(form) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.post(url + '/merchant')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token) // step 1
                     .send(form)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Merchant account creation succeeded\n')
                             resolve(res);
                         }
@@ -529,14 +557,17 @@ function retrieveIdMerchant(merchant_id) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.get(url + '/merchant/' + merchant_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Merchant record retrieved successfully\n')
                             resolve(res);
                         }
@@ -577,7 +608,7 @@ function retrieveBranches() {
         promiseCreateToken.then((value) => {
 
             if (value.statusCode == 200) {
-
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
 
                         request.get(url + '/branch')
@@ -585,7 +616,7 @@ function retrieveBranches() {
                         .set('Accept', 'application/json')
                         .set('Authorization', 'Bearer ' + token)
                         .end((err, res) => {
-                            if (res.statusCode == 200) {
+                            if (res.statusCode >= 200 && res.statusCode <= 299) {
                                 console.log('Step 2: Merchant’s Branch account retrieve succeeded\n')
                                 resolve(res);
                             }
@@ -640,15 +671,18 @@ function createBranch(form) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.post(url + '/branch')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token) // step 1
                     .send(form)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Merchant’s Branch account creation succeeded\n')
                             resolve(res);
                         }
@@ -683,14 +717,17 @@ function retrieveIdBranch(branch_id) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
+
             if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
                 var token = value.body.token
+
                 request.get(url + '/branch/' + branch_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Branch account retrieved successfully\n')
                             resolve(res);
                         }
@@ -865,7 +902,9 @@ var form = {
 //         var promiseCreateToken = createToken();
 //         promiseCreateToken.then((value) => {
 //             if (value.statusCode == 200) {
+//                 console.log('Step 1: Successful\n')
 //                 var token = value.body.token
+
 //                 request.put(url + '/settlement/completed')
 //                     .set('Content-Type', 'application/json')
 //                     .set('Accept', 'application/json')
