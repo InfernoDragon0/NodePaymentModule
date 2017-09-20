@@ -4,7 +4,9 @@ var api = require('./databaseApiCallp2.js')
 
 // response all transaction
 
-module.exports.RetrieveTransactions = RetrieveTransactions();
+// /*TEST:*/ RetrieveTransactions(); /
+
+module.exports.RetrieveTransactions = RetrieveTransactions;
 
 function RetrieveTransactions() {
     return new Promise((resolve, reject) => {
@@ -34,7 +36,27 @@ function RetrieveTransactions() {
     }) // close promise
 };
 
+function addMerchantNameToData() {
+    return new Promise((resolve, reject) => {
+        var openPromise = RetrieveTransactions()
+        openPromise.then((data) => {
+            for (var counter = 0; counter < data.length; counter++) {
+                data[counter].fk_merchant_id
+                var openAnotherPromise = api.retrieveIdMerchant(data[counter].fk_merchant_id)
+                openAnotherPromise.then((data2) => {
+                    data[counter].merchantName = data2.merchant_name
+                })
+            }
+            resolve(data);
+        })
+    })
+}
+
 // retrieve unpaid transactions
+
+module.exports.RetrieveUnpaid = RetrieveUnpaid;
+
+// /*TEST:*/ RetrieveUnpaid(); /
 
 function RetrieveUnpaid() {
     return new Promise((resolve, reject) => {
@@ -57,7 +79,7 @@ function RetrieveUnpaid() {
             } else if (value.statusCode == 200) {
                 var arrayJson = [];
                 for (var i = 0; i < value.body.length; i++) {
-                    if ((value.body[i].transaction_type == 1 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 2 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 5 && value.body[i].transaction_complete == false)) {
+                    if ((value.body[i].transaction_type == 1 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 2 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 5 && value.body[i].transaction_complete == false) || (value.body[i].transaction_type == 6 && value.body[i].transaction_complete == true)) {
                         arrayJson.push(value.body[i])
                     }
                 }
@@ -74,6 +96,10 @@ function RetrieveUnpaid() {
 
 
 // retrieve paid transactions 
+
+module.exports.RetrievePaid = RetrievePaid;
+
+// /*TEST:*/ RetrievePaid(); /
 
 function RetrievePaid() {
     return new Promise((resolve, reject) => {
@@ -111,7 +137,12 @@ function RetrievePaid() {
     }) // close promise
 };
 
+
 // retrieve all successful transactions // for refunds
+
+module.exports.RetrieveSuccessTransaction = RetrieveSuccessTransaction;
+
+// /*TEST:*/ RetrieveSuccessTransaction();
 
 function RetrieveSuccessTransaction() {
     return new Promise((resolve, reject) => {
@@ -149,7 +180,12 @@ function RetrieveSuccessTransaction() {
     }) // close promise
 };
 
+
 // retrieve settled transactions // for chargeback
+
+module.exports.RetrievePaymentTransaction = RetrievePaymentTransaction;
+
+// /*TEST:*/ functionName
 
 function RetrievePaymentTransaction() {
     return new Promise((resolve, reject) => {
@@ -187,7 +223,12 @@ function RetrievePaymentTransaction() {
     }) // close promise
 };
 
+
 // retrieve all chargebacked transactions
+
+module.exports.RetrieveChargeback = RetrieveChargeback;
+
+// /*TEST:*/ functionName
 
 function RetrieveChargeback() {
     return new Promise((resolve, reject) => {
@@ -225,7 +266,12 @@ function RetrieveChargeback() {
     }) // close promise
 };
 
+
 // retrieve all wallet payment transactions
+
+module.exports.RetrievePayment = RetrievePayment;
+
+// /*TEST:*/ functionName
 
 function RetrievePayment() {
     return new Promise((resolve, reject) => {
@@ -263,7 +309,12 @@ function RetrievePayment() {
     }) // close promise
 };
 
+
 // refund full transaction
+
+module.exports.FullRefund = FullRefund;
+
+// /*TEST:*/ functionName
 
 function FullRefund(transactionId) {
     return new Promise((resolve, reject) => {
@@ -309,7 +360,7 @@ function FullRefund(transactionId) {
                                         "fk_merchant_id": merchantId,
                                         "fk_branch_id": branchId,
                                         "braintree_transaction_id": value.refundId,
-                                        "transaction_amount": value.amount,
+                                        "transaction_amount": -value.amount,
                                         "transaction_type": 3
                                     }
 
@@ -339,45 +390,7 @@ function FullRefund(transactionId) {
                         }
                     });
 
-                } else if (value.body.transaction_type == 5 && value.body.transaction_complete == false) {
-
-                    var brainId = value.body.braintree_transaction_id;
-                    var userId = value.body.fk_user_id;
-                    var merchantId = value.body.fk_merchant_id;
-                    var branchId = value.body.fk_branch_id;
-
-//////////////////////////// Update hyper wallet
-
-                    var form = {
-                        "fk_user_id": userId,
-                        "fk_merchant_id": merchantId,
-                        "fk_branch_id": branchId,
-                        "braintree_transaction_id": value.refundId,
-                        "transaction_amount": value.amount,
-                        "transaction_type": 3
-                    }
-
-                    var promiseCreateTransaction = api.createTransaction(form) // add refund transaction to our database
-
-                    promiseCreateTransaction.then((value) => {
-                        // console.log(value.body);
-                        if (value.statusCode >= 200 && value.statusCode <= 299) {
-                            console.log('Step 4 : Inserted refund to our database\n')
-                            resolve(value);
-                        }
-                        else if (value.statusCode == 400) {
-                            console.log('Step 4: Fail to insert refund to our database\n')
-                            resolve(value);
-                        } else {
-                            console.log('Step 4: Could not establish proper connection with database\n')
-                            resolve(-1);
-                        }
-                    })
-
-////////////////////////////// Update hyperwallet
-
-                }
-                else if (value.transaction_type == 3 || value.transaction_type == 6) {
+                } else if (value.transaction_type == 3 || value.transaction_type == 6) {
                     console.log("transaction is already refunded")// transaction has been refunded in the database
                     resolve("transaction is already refunded") // can be resolved as something else
                 } else {
@@ -394,7 +407,11 @@ function FullRefund(transactionId) {
 
 // refund partial transaction
 
-function partialRefund(transactionId, refundAmount) {
+module.exports.PartialRefund = PartialRefund;
+
+// /*TEST:*/ functionName
+
+function PartialRefund(transactionId, refundAmount) {
     return new Promise((resolve, reject) => {
         var promiseRetrieveIdTransaction = api.retrieveIdTransaction(transactionId);// get transaction details with id
 
@@ -436,7 +453,7 @@ function partialRefund(transactionId, refundAmount) {
                                         "fk_merchant_id": merchantId,
                                         "fk_branch_id": branchId,
                                         "braintree_transaction_id": value.refundId[length],
-                                        "transaction_amount": refundAmount,
+                                        "transaction_amount": -refundAmount,
                                         "transaction_type": 3
                                     }
 
@@ -467,40 +484,7 @@ function partialRefund(transactionId, refundAmount) {
                         }
                     });
 
-                }else if (value.body.transaction_type == 5 && value.body.transaction_complete == false) {
-                    // console.log(value.body.braintree_transaction_id)
-
-////////////////// Check if refundable/ Update hyperwallet
-                                    var form = {
-                                        "fk_user_id": userId,
-                                        "fk_merchant_id": merchantId,
-                                        "fk_branch_id": branchId,
-                                        "braintree_transaction_id": value.refundId[length],
-                                        "transaction_amount": refundAmount,
-                                        "transaction_type": 3
-                                    }
-
-                                    var promiseCreateTransaction = api.createTransaction(form) // add refund transaction to our database
-
-                                    promiseCreateTransaction.then((value) => {
-                                        // console.log(value.body);
-                                        if (value.statusCode >= 200 && value.statusCode <= 299) {
-                                            console.log("Step 4 : Inserted refund to our database\n")
-                                            resolve(value)
-                                        }
-                                        else if (value.statusCode == 400) {
-                                            console.log("Step 4: Fail to insert refund to our database\n")
-                                            resolve(value)
-                                        } else {
-                                            console.log('Step 4: Could not establish proper connection with database\n')
-                                            resolve(-1);
-                                        }
-                                    })
-
-//////////////////////////////// Check if refundable/ Update hyperwallet
-
-                }
-                 else if (value.transaction_type == 3) {
+                } else if (value.transaction_type == 3) {
                     resolve("transaction is already refunded")
                 } else {
                     resolve("transaction cannot be refunded")// either chargeback, or already completed -- if so, chargeback
@@ -515,7 +499,11 @@ function partialRefund(transactionId, refundAmount) {
 
 // insert settlement record for transactions about to be settled
 
-function insertSettlement(transactionId) {
+module.exports.InsertSettlement = InsertSettlement;
+
+// /*TEST:*/ functionName
+
+function InsertSettlement(transactionId) {
     return new Promise((resolve, reject) => {
 
         var promiseRetrieveSettlements = api.retrieveSettlements(); // check if transaction has been settled
@@ -565,42 +553,130 @@ function insertSettlement(transactionId) {
                             console.log('Transaction record retrieved successfully\n')
                             console.log(value.body)
 
-                            var form = {
-                                "fk_merchant_id": value.body.fk_merchant_id,
-                                "fk_branch_id": fk_branch_id,
-                                "fk_transaction_id": transactionId,
-                                "settlement_amount": commission(parseInt(value.body.amount))
+                            if ((value.body.transaction_type == 1 && value.body.transaction_complete == false) || (value.body.transaction_type == 5 && value.body.transaction_complete == false)) {
+                                var form = {
+                                    "fk_merchant_id": value.body.fk_merchant_id,
+                                    "fk_branch_id": fk_branch_id,
+                                    "fk_transaction_id": transactionId,
+                                    "settlement_amount": commission(value.body.amount)
+                                }
+
+                                var promiseCreateSettlement = api.createSettlement(form); // create settlement record
+
+                                promiseCreateSettlement.then((value) => {
+                                    if (value.statusCode >= 200 && value.statusCode <= 299) {
+                                        console.log('Insert settlement record successful\n')
+
+                                        var form1 = {
+                                            "transaction_id": transactionId
+                                        }
+
+                                        var promiseConfirmTransaction = api.confirmTransaction(form1);
+                                        promiseConfirmTransaction.then((value) => {
+                                            if (value == -1) {
+                                                console.log('special errors')
+                                                resolve(value)
+                                            } else if (value.statusCode == 200) {
+                                                resolve(value);
+                                            } else {
+                                                resolve(-1)
+                                            }
+                                        })
+
+
+                                    } else if (value.statusCode == 400) {
+                                        console.log('Failed to insert settlement for transaction\n')
+                                        resolve(value)
+                                    } else {
+                                        console.log('Step 4: Could not establish proper connection with database\n')
+                                        resolve(-1);
+                                    }
+                                })
+                            } else if (value.body.transaction == 2 && value.body.transaction_complete == false) {
+                                var form = {
+                                    "fk_merchant_id": value.body.fk_merchant_id,
+                                    "fk_branch_id": fk_branch_id,
+                                    "fk_transaction_id": transactionId,
+                                    "settlement_amount": commission(value.body.amount)
+                                }
+
+                                var promiseCreateSettlement = api.createSettlement(form); // create settlement record
+
+                                promiseCreateSettlement.then((value) => {
+                                    if (value.statusCode >= 200 && value.statusCode <= 299) {
+                                        console.log('Insert settlement record successful\n')
+
+                                        var form1 = {
+                                            "transaction_id": transactionId
+                                        }
+
+                                        var promiseConfirmTransaction = api.confirmTransaction(form1);
+                                        promiseConfirmTransaction.then((value) => {
+                                            if (value == -1) {
+                                                console.log('special errors')
+                                                resolve(value)
+                                            } else if (value.statusCode == 200) {
+                                                resolve(value);
+                                            } else {
+                                                resolve(-1)
+                                            }
+                                        })
+
+
+                                    } else if (value.statusCode == 400) {
+                                        console.log('Failed to insert settlement for transaction\n')
+                                        resolve(value)
+                                    } else {
+                                        console.log('Step 4: Could not establish proper connection with database\n')
+                                        resolve(-1);
+                                    }
+                                })
+                            } else if (value.body.transaction == 6 && value.body.transaction_complete == false) {
+                                var form = {
+                                    "fk_merchant_id": value.body.fk_merchant_id,
+                                    "fk_branch_id": fk_branch_id,
+                                    "fk_transaction_id": transactionId,
+                                    "settlement_amount": commission(value.body.amount)
+                                }
+
+                                var promiseCreateSettlement = api.createSettlement(form); // create settlement record
+
+                                promiseCreateSettlement.then((value) => {
+                                    if (value.statusCode >= 200 && value.statusCode <= 299) {
+                                        console.log('Insert settlement record successful\n')
+
+                                        var form1 = {
+                                            "transaction_id": transactionId
+                                        }
+
+                                        var promiseConfirmTransaction = api.confirmTransaction(form1);
+                                        promiseConfirmTransaction.then((value) => {
+                                            if (value == -1) {
+                                                console.log('special errors')
+                                                resolve(value)
+                                            } else if (value.statusCode == 200) {
+                                                resolve(value);
+                                            } else {
+                                                resolve(-1)
+                                            }
+                                        })
+
+
+                                    } else if (value.statusCode == 400) {
+                                        console.log('Failed to insert settlement for transaction\n')
+                                        resolve(value)
+                                    } else {
+                                        console.log('Step 4: Could not establish proper connection with database\n')
+                                        resolve(-1);
+                                    }
+                                })
+                            }
+                            else {
+                                console.log("transaction cannot be refunded")
+                                resolve(-1)
                             }
 
-                            var promiseCreateSettlement = api.createSettlement(form); // create settlement record
 
-                            promiseCreateSettlement.then((value) => {
-                                if (value.statusCode >= 200 && value.statusCode <= 299) {
-                                    console.log('Insert settlement record successful\n')
-
-                                    var form1 = {
-                                        "transaction_id": transactionId
-                                    }
-
-                                    var promiseConfirmTransaction = api.confirmTransaction(form1);
-                                    promiseConfirmTransaction.then((value)=>{
-                                        if (value == -1) {
-                                            console.log('special errors')
-                                            resolve(value)
-                                        } else if (value.statusCode == 200) {
-                                            resolve(value);
-                                        }else{
-                                            resolve(-1)
-                                        }
-                                    })
-                                } else if (value.statusCode == 400) {
-                                    console.log('Failed to insert settlement for transaction\n')
-                                    resolve(value)
-                                } else {
-                                    console.log('Step 4: Could not establish proper connection with database\n')
-                                    resolve(-1);
-                                }
-                            })
 
                         } else {
                             console.log('passing on the error message');
@@ -623,7 +699,12 @@ function commission(value) {
     return newCommission;
 };
 
+
 // retrieve refund transactions
+
+module.exports.RetrieveRefund = RetrieveRefund;
+
+// /*TEST:*/ functionName
 
 function RetrieveRefund() {
     return new Promise((resolve, reject) => {
@@ -659,7 +740,12 @@ function RetrieveRefund() {
     }) // close promise
 };
 
+
 // retrieve refunded transactions
+
+module.exports.RetrieveRefunded = RetrieveRefunded;
+
+// /*TEST:*/ functionName
 
 function RetrieveRefunded() {
     return new Promise((resolve, reject) => {
@@ -695,7 +781,12 @@ function RetrieveRefunded() {
     }) // close promise
 };
 
+
 // retrieve refund transactions
+
+module.exports.RetrieveWalletRefund = RetrieveWalletRefund;
+
+// /*TEST:*/ functionName
 
 function RetrieveWalletRefund() {
     return new Promise((resolve, reject) => {
@@ -731,13 +822,13 @@ function RetrieveWalletRefund() {
     }) // close promise
 };
 
-
-// insert chargeback transactions
-// maybe can use chargeback
-
 // search successful earnings by time
 
-function getSuccess(date1, date2) {
+module.exports.GetSuccess = GetSuccess;
+
+// /*TEST:*/ functionName
+
+function GetSuccess(date1, date2) {
     return new Promise((resolve, reject) => {
 
         var promiseRetrieveTransactions = api.retrieveTransactions();
@@ -787,7 +878,11 @@ function getSuccess(date1, date2) {
 
 // search successful earnings for merchants by time
 
-function getMerchantSuccess(date1, date2, merchantId) {
+module.exports.GetMerchantSuccess = GetMerchantSuccess;
+
+// /*TEST:*/ functionName
+
+function GetMerchantSuccess(date1, date2, merchantId) {
     return new Promise((resolve, reject) => {
 
         var promiseRetrieveTransactions = api.retrieveTransactions();
@@ -835,9 +930,14 @@ function getMerchantSuccess(date1, date2, merchantId) {
     }) // close promise
 }
 
+
 // search settled earnings by time
 
-function getCompleted(date1, date2) {
+module.exports.GetCompleted = GetCompleted;
+
+// /*TEST:*/ functionName
+
+function GetCompleted(date1, date2) {
     return new Promise((resolve, reject) => {
 
         var promiseRetrieveTransactions = api.retrieveTransactions();
@@ -885,9 +985,14 @@ function getCompleted(date1, date2) {
     }) // close promise
 }
 
+
 // search settled earnings for merchants by time
 
-function getMerchantCompleted(date1, date2, merchantId) {
+module.exports.GetMerchantCompleted = GetMerchantCompleted;
+
+// /*TEST:*/ functionName
+
+function GetMerchantCompleted(date1, date2, merchantId) {
     return new Promise((resolve, reject) => {
 
         var promiseRetrieveTransactions = api.retrieveTransactions();
@@ -935,12 +1040,20 @@ function getMerchantCompleted(date1, date2, merchantId) {
     }) // close promise
 }
 
-function insertChargeback(transactionId){
-    new Promise ((resolve, reject)=>{
+
+
+// insert chargeback to settlement
+
+module.exports.InsertChargeback = InsertChargeback;
+
+// /*TEST:*/ functionName
+
+function InsertChargeback(transactionId) {
+    new Promise((resolve, reject) => {
 
         var promiseRetrieveIdTransaction = api.retrieveIdTransaction(transactionId);
 
-        promiseRetrieveIdTransaction.then((value)=>{
+        promiseRetrieveIdTransaction.then((value) => {
             if (value == -1) {
                 console.log('special errors')
                 resolve(value)
@@ -955,15 +1068,18 @@ function insertChargeback(transactionId){
                 resolve(value)
             } else if (value.statusCode == 200) {
 
-                if(value.body.transaction_type == 1 && value.body.transaction_complete == true){
+                if (value.body.transaction_type == 1 && value.body.transaction_complete == true) {
                     console.log('transaction can be chargedback')
 
                     var form = {
-
+                        "fk_merchant_id": value.body.fk_merchant_id,
+                        "fk_branch_id": value.body.fk_branch_id,
+                        "fk_transaction_id": value.body.transactionId,
+                        "settlement_amount": commission(value.body.amount)
                     }
 
                     var promiseCreateSettlement = api.createSettlement(form);
-                    promiseCreateSettlement.then((value)=>{
+                    promiseCreateSettlement.then((value) => {
                         if (value == -1) {
                             console.log('special errors')
                             resolve(value)
@@ -979,21 +1095,21 @@ function insertChargeback(transactionId){
                         } else if (value.statusCode >= 200 && value.statusCode <= 299) {
                             console.log(value.message)
                             resolve(value)
-                        }else{
+                        } else {
                             console.log('not properly connected to database')
-                            resolve (-1)
+                            resolve(-1)
                         }
                     })
 
-                }else if (value.body.transaction_complete == false){
+                } else if (value.body.transaction_complete == false) {
                     console.log('transaction has not been paid and cannot be refunded')
                     resolve(value)
-                }else{
+                } else {
                     console.log('transaction cannot be chargebacked')
                     resolve(value)
                 }
 
-            }else {
+            } else {
                 console.log('passing on the error message')
                 resolve(value);
             }
@@ -1010,7 +1126,11 @@ function insertChargeback(transactionId){
 
 // Calculate earnings of all unpaid transaction 
 
-function getEarnings() {
+module.exports.GetUnpaidEarnings = GetUnpaidEarnings;
+
+// /*TEST:*/ GetUnpaidEarnings();
+
+function GetUnpaidEarnings() {
 
     var promiseRetrieveTransactions = api.retrieveTransactions();
 
@@ -1075,7 +1195,11 @@ function getEarnings() {
 
 // Calculate earnings of all paid transaction 
 
-function getEarnings() {
+module.exports.GetPaidEarnings = GetPaidEarnings;
+
+// /*TEST:*/ functionName
+
+function GetPaidEarnings() {
 
     var promiseRetrieveTransactions = api.retrieveTransactions();
 

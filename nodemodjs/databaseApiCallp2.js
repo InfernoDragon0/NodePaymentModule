@@ -1,6 +1,6 @@
 const request = require('superagent');
 
-url = 'http://380c40aa.ngrok.io/api'
+url = 'http://898c16d9.ngrok.io/api'
 
 function createToken() {
     return new Promise((resolve, reject) => {
@@ -26,9 +26,13 @@ function createToken() {
     });
 }
 
+// /*TEST:*/ createToken(); /
+
 // Find all transaction records
 // Step 1: Connect to JE database with token
 // Step 2: Retrieve all transactions from JE database
+
+// /*TEST:*/ retrieveTransactions(); //
 
 module.exports.retrieveTransactions = retrieveTransactions;
 
@@ -81,14 +85,16 @@ function retrieveTransactions() {
 
 /*
 var form = {
-    "fk_user_id": 0,
-    "fk_merchant_id": 0,
-    "fk_branch_id": 0,
-    "braintree_transaction_id": "string",
-    "transaction_amount": 0,
-    "transaction_type": 0
+    "fk_user_id": 7,
+    "fk_merchant_id": 56,
+    "fk_branch_id": 1,
+    "braintree_transaction_id": 'stringbraintree',
+    "transaction_amount": -200,
+    "transaction_type": 2
 }
 */
+
+// /*TEST:*/ createTransaction(form); /
 
 module.exports.createTransaction = createTransaction;
 
@@ -136,6 +142,8 @@ function createTransaction(form) {
 // Find transaction records by ID
 // Step 1: Retrieve token
 // Step 2: Retrieve transaction details from database by id
+
+// /*TEST:*/ retrieveIdTransaction('8c31804e-2807-4b50-7795-08d4ffd71ce7'); /
 
 module.exports.retrieveIdTransaction = retrieveIdTransaction;
 
@@ -187,6 +195,8 @@ function retrieveIdTransaction(transaction_id) {
 // Step 1: Retrieve token
 // Step 2: Delete transaction from database by id
 
+// /*TEST:*/ deleteIdTransaction('145a54d4-204b-4769-94ae-08d4fa64f6e5'); /
+
 module.exports.deleteIdTransaction = deleteIdTransaction;
 
 function deleteIdTransaction(transaction_id) {
@@ -235,6 +245,8 @@ function deleteIdTransaction(transaction_id) {
 // Find all settlements records
 // Step 1: Retrieve token
 // Step 2: Retrieve settlement records from JE database
+
+// /*TEST:*/ retrieveSettlements(); /
 
 module.exports.retrieveSettlements = retrieveSettlements;
 
@@ -285,14 +297,16 @@ function retrieveSettlements() {
 // Step 1: Retrieve token
 // Step 2: Add settlement records into JE database
 
-/*
+
 var form = {
-    "fk_merchant_id": 0,
-    "fk_branch_id": 0,
-    "fk_transaction_id": 0,
-    "settlement_amount": 0
+    "fk_merchant_id": 56,
+    "fk_branch_id": 1,
+    "fk_transaction_id": '8c31804e-2807-4b50-7795-08d4ffd71ce7',
+    "settlement_amount": -200
 }
-*/
+
+
+// /*TEST:*/ createSettlement(form); // to be retested
 
 module.exports.createSettlement = createSettlement;
 
@@ -339,6 +353,8 @@ function createSettlement(form) {
 // Find settlement records by ID
 // Step 1: Retrieve token
 // Step 2: Retrieve settlement records from JE database by id
+
+// /*TEST:*/ createToken();
 
 module.exports.retrieveIdSettlement = retrieveIdSettlement;
 
@@ -388,6 +404,8 @@ function retrieveIdSettlement(settlement_id) {
 // Delete settlement record by ID
 // Step 1: Retrieve token
 // Step 2: Delete settlement record from JE database by id
+
+// /*TEST:*/ createToken();
 
 module.exports.deleteIdSettlement = deleteIdSettlement;
 
@@ -444,6 +462,8 @@ var form = {
 }
 */
 
+// /*TEST:*/ createToken();
+
 module.exports.confirmTransaction = confirmTransaction;
 
 function confirmTransaction(transaction_id) {
@@ -486,24 +506,76 @@ function confirmTransaction(transaction_id) {
     });
 }
 
+// Find all merchants
+// Step 1: Retrieve token
+// Step 2: Retrieve merchant records from JE database
+
+// /*TEST:*/ retrieveMerchants(); /
+
+module.exports.retrieveMerchants = retrieveMerchants;
+
+function retrieveMerchants() {
+    return new Promise((resolve, reject) => {
+        var promiseCreateToken = createToken();
+        promiseCreateToken.then((value) => {
+
+            if (value.statusCode == 200) {
+                console.log('Step 1: Successful\n')
+                var token = value.body.token
+
+                request.get(url + '/merchant')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + token)
+                    .end((err, res) => {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
+                            console.log('Step 2: Merchant records retrieved successfully\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Step 2: Invalid\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 404) {
+                            console.log('Step 2: Merchant not found\n')
+                            resolve(res);
+                        }else{
+                            console.log('Step 2: Could not establish proper connection with database\n')
+                            resolve(-1)
+                        }
+                    })
+            }
+            else if (value.statusCode == 401) {
+                console.log('Step 1: Unauthorized\n')
+                resolve(value); 
+            }
+            else {
+                console.log('Step 1: Could not establish connection with database\n')
+                resolve(value)
+            }
+        })
+    });
+}
+
 // Create merchant records in JE database
 // Step 1: Retrieve token
 // Step 2: Create merchant records
 
+
 /*
-
 var form = {
-  "merchant_name": "string",
-  "company_name": "string",
-  "first_name": "string",
-  "last_name": "string",
-  "email": "string",
-  "merchant_url": "string",
-  "mobile_number": "string",
-  "password": "string"
+  "merchant_name": "caleb inc",
+  "company_name": "caleb inc",
+  "first_name": "caleb",
+  "last_name": "cheong",
+  "email": "calebcheong98@gmail.com",
+  "merchant_url": "hhtps://www.calbee.com",
+  "mobile_number": "67873442",
+  "password": "password"
 }
-
 */
+
+// /*TEST:*/ createMerchant(form); /
 
 module.exports.createMerchant = createMerchant;
 
@@ -551,9 +623,11 @@ function createMerchant(form) {
 // Step 1: Retrieve token
 // Step 2: Retrieve merchant details
 
+// /*TEST:*/ retrieveIdMerchant(11); /
+
 module.exports.retrieveIdMerchant = retrieveIdMerchant;
 
-function retrieveIdMerchant(merchant_id) {
+function retrieveIdMerchant(merchantId) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
@@ -562,7 +636,7 @@ function retrieveIdMerchant(merchant_id) {
                 console.log('Step 1: Successful\n')
                 var token = value.body.token
 
-                request.get(url + '/merchant/' + merchant_id)
+                request.get(url + '/merchant/' + merchantId)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
                     .set('Authorization', 'Bearer ' + token)
@@ -599,6 +673,8 @@ function retrieveIdMerchant(merchant_id) {
 // Get All Branch Account
 // Step 1: Connect to JE database with token
 // Step 2: Retrieve all branch accounts from JE database
+
+// /*TEST:*/ retrieveBranches(); / 
 
 module.exports.retrieveBranches = retrieveBranches;
 
@@ -649,21 +725,22 @@ function retrieveBranches() {
 // Step 1: Retrieve token
 // Step 2: Create branch records
 
+
 /*
-
 var form = {
-  "branch_name": "string",
-  "branch_address": "string",
-  "branch_phone": "string",
-  "branch_url": "string",
-  "first_name": "string",
-  "last_name": "string",
-  "email": "string",
-  "mobile_number": "string",
-  "password": "string"
+  "branch_name": "thaddeus 1",
+  "branch_address": "pasir ris",
+  "branch_phone": "50965898",
+  "branch_url": "habibi.com",
+  "first_name": "thaddeus",
+  "last_name": "tan",
+  "email": "thaddeus0905@gmail.com",
+  "mobile_number": "68403392",
+  "password": "werwerw"
 }
-
 */
+
+// /*TEST:*/ createBranch(form); /
 
 module.exports.createBranch = createBranch;
 
@@ -710,6 +787,8 @@ function createBranch(form) {
 // Find branch account by ID
 // Step 1: Retrieve token
 // Step 2: Retrieve branch account from JE database by id
+
+// /*TEST:*/ retrieveIdBranch(17); /
 
 module.exports.retrieveIdBranch = retrieveIdBranch;
 
@@ -847,6 +926,8 @@ var form = {
   }
   */
 
+  /*TEST:*/ 
+
 // module.exports.updateIdSettlement = updateIdSettlement;
 
 // function updateIdSettlement(settlement_id, form) {
@@ -894,6 +975,8 @@ var form = {
     "settlement_id": 0
 }
 */
+
+/*TEST:*/ 
 
 // module.exports.confirmSettlement = confirmSettlement;
 

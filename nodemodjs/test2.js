@@ -1,18 +1,54 @@
-// var count = 0
-// var array = [1,-2,3,4,5]
+// var date = new Date('04/12/2012 07:00')
+// date = date.getTime();
 
-// for (i = 0; i< array.length; i ++){
-//  count = count + array[i]
-// }
+// console.log(date)
 
-// console.log(count)
+var api = require('./databaseApiCallp2.js')
 
-///////////////////////////////////
+var func = require('./admindb.js')
 
-// var store = new Date();
-// console.log(store)
+function test() {
+    return new Promise((resolve, reject)=>{
+    var promiseRetrieveTransactions = func.RetrieveTransactions();
+    promiseRetrieveTransactions.then((value) => {
+        console.log(value)
 
-var date = new Date('04/12/2012 07:00')
-date = date.getTime();
+        var array = []
+        for (var i = 0; i < value.length; i++) {
+        var tId = value[i].transaction_id
+        var uId = value[i].fk_user_id
+        var mId = value[i].fk_merchant_id
+        var bId = value[i].fk_branch_id
+        var cTime = value[i].create_at
+        var tAmount = value[i].transaction_amount
+        var tType = value[i].transaction_type
 
-console.log(date)
+            var promiseRetrieveIdMerchant = api.retrieveIdMerchant(mId);
+
+            promiseRetrieveIdMerchant.then((value) => {
+                if(value.merchant_id == mId){
+                    var mName = value.merchant_name
+
+                    var data = {
+                        "transaction_id" : tId,
+                        "user_id" : uId,
+                        "merchant_id" : mId,
+                        "merchant_name" : mName,
+                        "create_at" : cTime,
+                        "transaction_amount" : tAmount,
+                        "transaction_type" : tType
+                    }
+                    array.push(data)
+                    console.log(data)
+                }
+            })
+
+        }
+        
+
+    })
+})
+}
+
+
+test();
