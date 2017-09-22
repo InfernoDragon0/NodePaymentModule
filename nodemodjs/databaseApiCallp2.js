@@ -1,32 +1,32 @@
 const request = require('superagent');
+const databaseConfig = require("./config/databaseConfig.js");
 
-url = 'http://898c16d9.ngrok.io/api'
+const url = `${databaseConfig.url}`
+const primaryKey =  `${databaseConfig.primary_key}`
 
 function createToken() {
     return new Promise((resolve, reject) => {
-        
-        var primary_key = "NnGUnatosykldCDs6m5Ma4tBGlb6Wyue912JLQ=="
         request.post(url + '/account/token')
             .set('Content-Type', 'application/json')
-            .send({ "primary_key": primary_key })
+            .send({ "primary_key": primaryKey })
             .end((err, res) => {
-                if (res.statusCode == 200) {
-                    console.log('\nSuccessful\n')
-                    resolve(res);
+                if (res.statusCode >= 200 && res.statusCode <= 299) {
+                    console.log('\n Retrieve Token: Successful\n')
+                    resolve(res.body.token);
                 }
                 else if (res.statusCode == 401) {
-                    console.log('\nUnauthorized\n')
+                    console.log('\n Retrieve Token: Unauthorized\n')
                     resolve(res);
                 }
                 else {
-                    console.log('\nCould not establish proper connection with database\n')
+                    console.log('\n Retrieve Token: Could not establish proper connection with database\n')
                     resolve(-1)
                 }
             })
     });
 }
 
-// /*TEST:*/ createToken(); /
+// /*TEST:*/ createToken(); //
 
 // Find all transaction records
 // Step 1: Connect to JE database with token
@@ -41,40 +41,27 @@ function retrieveTransactions() {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.get(url + '/transaction')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Transaction details retrieved successfully\n')
+                            console.log('Retrieve Transaction: Transaction details retrieved successfully\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid\n')
+                            console.log('Retrieve Transaction: Invalid\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 404) {
-                            console.log('Step 2: Transaction not found\n')
+                            console.log('Retrieve Transaction: Transaction not found\n')
                             resolve(res);
                         }else {
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Retrieve Transaction: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish proper connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -83,58 +70,47 @@ function retrieveTransactions() {
 // Step 1: retrieve token
 // Step 2: insert transaction into database
 
-/*
-var form = {
-    "fk_user_id": 7,
-    "fk_merchant_id": 56,
-    "fk_branch_id": 1,
-    "braintree_transaction_id": 'stringbraintree',
-    "transaction_amount": -200,
-    "transaction_type": 2
-}
-*/
+//   "fk_user_id": 0,
+//   "fk_merchant_id": 0,
+//   "fk_branch_id": 0,
+//   "braintree_transaction_id": "string",
+//   "transaction_amount": 0,
+//   "transaction_type": 0
 
-// /*TEST:*/ createTransaction(form); /
+// /*TEST:*/ createTransaction(1, 10, 123, 'work', 50.00, 2); //
 
 module.exports.createTransaction = createTransaction;
 
-function createTransaction(form) {
+function createTransaction(fk_user_id, fk_merchant_id, fk_branch_id, braintree_transaction_id, transaction_amount, transaction_type) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.post(url + '/transaction')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token) 
-                    .send(form)
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "fk_user_id": fk_user_id, // integer
+                        "fk_merchant_id": fk_merchant_id, // integer
+                        "fk_branch_id": fk_branch_id, // integer
+                        "braintree_transaction_id": braintree_transaction_id, // string
+                        "transaction_amount": transaction_amount, // integer
+                        "transaction_type": transaction_type // integer
+                      })
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Transaction Response\n')
-                            console.log(res.body)
+                            console.log('Create Transaction: Transaction Response\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid Transaction body\n')
+                            console.log('Create Transaction: Invalid Transaction body\n')
                             resolve(res);
                         }else {
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Create Transaction: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish proper connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -146,47 +122,33 @@ function createTransaction(form) {
 // /*TEST:*/ retrieveIdTransaction('8c31804e-2807-4b50-7795-08d4ffd71ce7'); /
 
 module.exports.retrieveIdTransaction = retrieveIdTransaction;
-
     
 function retrieveIdTransaction(transaction_id) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.get(url + '/transaction/' + transaction_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Transaction record retrieved successfully\n')
+                            console.log('Retreive ID Transaction: Transaction record retrieved successfully\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid ID supplied\n')
+                            console.log('Retreive ID Transaction: Invalid ID supplied\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 404) {
-                            console.log('Step 2: Transaction not found\n')
+                            console.log('Retreive ID Transaction: Transaction not found\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Retreive ID Transaction: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -204,40 +166,27 @@ function deleteIdTransaction(transaction_id) {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.delete(url + '/transaction/' + transaction_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Successfully deleted Transaction\n')
+                            console.log('Delete ID Transaction: Successfully deleted Transaction\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid ID supplied\n')
+                            console.log('Delete ID Transaction: Invalid ID supplied\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 404) {
-                            console.log('Step 2: Transaction not found\n')
+                            console.log('Delete ID Transaction: Transaction not found\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Delete ID Transaction: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -255,40 +204,27 @@ function retrieveSettlements() {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.get(url + '/settlement')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Settlement details retrieved successfully\n')
+                            console.log('Retrieve Settlements: Settlement details retrieved successfully\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid\n')
+                            console.log('Retrieve Settlements: Invalid\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 404) {
-                            console.log('Step 2: Settlement not found\n')
+                            console.log('Retrieve Settlements: Settlement not found\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Retrieve Settlements: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -297,55 +233,43 @@ function retrieveSettlements() {
 // Step 1: Retrieve token
 // Step 2: Add settlement records into JE database
 
-
-var form = {
-    "fk_merchant_id": 56,
-    "fk_branch_id": 1,
-    "fk_transaction_id": '8c31804e-2807-4b50-7795-08d4ffd71ce7',
-    "settlement_amount": -200
-}
+//   "fk_merchant_id": 0,
+//   "fk_branch_id": 0,
+//   "fk_transaction_id": 0,
+//   "settlement_amount": 0
 
 
-// /*TEST:*/ createSettlement(form); // to be retested
+// /*TEST:*/ createSettlement(2, 2, "afsdfjsfjfofjsd", 28.75); 
 
 module.exports.createSettlement = createSettlement;
 
-function createSettlement(form) {
+function createSettlement(fk_merchant_id, fk_branch_id, fk_transaction_id, settlement_amount) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.post(url + '/settlement')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
-                    .send(form)
+                    .set('Authorization', 'Bearer ' + value)
+                    .send({
+                        "fk_merchant_id": fk_merchant_id, // integer
+                        "fk_branch_id": fk_branch_id, // integer
+                        "fk_transaction_id": fk_transaction_id, // integer
+                        "settlement_amount": settlement_amount // integer
+                    })
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Settlement Response\n')
+                            console.log('Create Settlement: Settlement Response\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid Settlement body\n')
+                            console.log('Create Settlement: Invalid Settlement body\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -363,40 +287,27 @@ function retrieveIdSettlement(settlement_id) {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.get(url + '/settlement/' + settlement_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Settlement record retrieved successfully\n')
+                            console.log('Retrieve ID Settlement: Settlement record retrieved successfully\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid ID supplied\n')
+                            console.log('Retrieve ID Settlement: Invalid ID supplied\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 404) {
-                            console.log('Step 2: Settlement not found\n')
+                            console.log('Retrieve ID Settlement: Settlement not found\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Retrieve ID Settlement: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -414,40 +325,27 @@ function deleteIdSettlement(settlement_id) {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.delete(url + '/settlement/' + settlement_id)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Successfully deleted Settlement\n')
+                            console.log('Delete ID Settlement: Successfully deleted Settlement\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid ID supplied\n')
+                            console.log('Delete ID Settlement: Invalid ID supplied\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 404) {
-                            console.log('Step 2: Settlement not found\n')
+                            console.log('Delete ID Settlement: Settlement not found\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Delete ID Settlement: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -471,37 +369,24 @@ function confirmTransaction(transaction_id) {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.put(url + '/transaction/completed')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .send({ "transaction_id": transaction_id }) // "settlement_id" : `${settlement_id}`
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Updated transaction\n')
+                            console.log('Confirm Transaction: Updated transaction\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid transaction\n')
+                            console.log('Confirm Transaction: Invalid transaction\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Confirm Transaction: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -519,40 +404,27 @@ function retrieveMerchants() {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.get(url + '/merchant')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Merchant records retrieved successfully\n')
+                            console.log('Retrieve Merchants: Merchant records retrieved successfully\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid\n')
+                            console.log('Retrieve Merchants: Invalid\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 404) {
-                            console.log('Step 2: Merchant not found\n')
+                            console.log('Retrieve Merchants: Merchant not found\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Retrieve Merchants: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -562,59 +434,52 @@ function retrieveMerchants() {
 // Step 2: Create merchant records
 
 
-/*
-var form = {
-  "merchant_name": "caleb inc",
-  "company_name": "caleb inc",
-  "first_name": "caleb",
-  "last_name": "cheong",
-  "email": "calebcheong98@gmail.com",
-  "merchant_url": "hhtps://www.calbee.com",
-  "mobile_number": "67873442",
-  "password": "password"
-}
-*/
+    // "merchant_name": "string",
+    // "company_name": "string",
+    // "first_name": "string",
+    // "last_name": "string",
+    // "email": "string",
+    // "merchant_url": "string",
+    // "mobile_number": "string",
+    // "password": "string"
 
-// /*TEST:*/ createMerchant(form); /
+
+// /*TEST:*/ createMerchant(merchant_name, company_name, first_name, last_name, email, merchant_url, mobile_number, password); /
 
 module.exports.createMerchant = createMerchant;
 
-function createMerchant(form) {
+function createMerchant(merchant_name, company_name, first_name, last_name, email, merchant_url, mobile_number, password) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.post(url + '/merchant')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token) // step 1
-                    .send(form)
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "merchant_name": merchant_name, // string
+                        "company_name": company_name, // string
+                        "first_name": first_name, // string
+                        "last_name": last_name, // string
+                        "email": email, // string
+                        "merchant_url": merchant_url, // string
+                        "mobile_number": mobile_number, // string
+                        "password": password
+                      })
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Merchant account creation succeeded\n')
+                            console.log('Create Merchant: Merchant account creation succeeded\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid Merchant body\n')
+                            console.log('Create Merchant: Invalid Merchant body\n')
                             resolve(res);
                         }else {
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Create Merchant: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish proper connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -632,14 +497,10 @@ function retrieveIdMerchant(merchantId) {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.get(url + '/merchant/' + merchantId)
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token)
+                    .set('Authorization', 'Bearer ' + value)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
                             console.log('Step 2: Merchant record retrieved successfully\n')
@@ -657,15 +518,6 @@ function retrieveIdMerchant(merchantId) {
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -683,40 +535,27 @@ function retrieveBranches() {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                         request.get(url + '/branch')
                         .set('Content-Type', 'application/json')
                         .set('Accept', 'application/json')
-                        .set('Authorization', 'Bearer ' + token)
+                        .set('Authorization', 'Bearer ' + value)
                         .end((err, res) => {
                             if (res.statusCode >= 200 && res.statusCode <= 299) {
-                                console.log('Step 2: Merchant’s Branch account retrieve succeeded\n')
+                                console.log('Retrieve Branches: Merchant’s Branch account retrieve succeeded\n')
                                 resolve(res);
                             }
                             else if (res.statusCode == 400) {
-                                console.log('Step 2: Invalid\n')
+                                console.log('Retrieve Branches: Invalid\n')
                                 resolve(res);
                             }
                             else if (res.statusCode == 404) {
-                                console.log('Step 2: Branch not found\n')
+                                console.log('Retrieve Branches: Branch not found\n')
                                 resolve(res);
                             }else {
-                                console.log('Step 2: Could not establish proper connection with database\n')
+                                console.log('Retrieve Branches: Could not establish proper connection with database\n')
                                 resolve(-1)
                             }
                         })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish proper connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -725,61 +564,54 @@ function retrieveBranches() {
 // Step 1: Retrieve token
 // Step 2: Create branch records
 
+    // "branch_name": "string",
+    // "branch_address": "string",
+    // "branch_phone": "string",
+    // "branch_url": "string",
+    // "first_name": "string",
+    // "last_name": "string",
+    // "email": "string",
+    // "mobile_number": "string",
+    // "password": "string"
+  
 
-/*
-var form = {
-  "branch_name": "thaddeus 1",
-  "branch_address": "pasir ris",
-  "branch_phone": "50965898",
-  "branch_url": "habibi.com",
-  "first_name": "thaddeus",
-  "last_name": "tan",
-  "email": "thaddeus0905@gmail.com",
-  "mobile_number": "68403392",
-  "password": "werwerw"
-}
-*/
-
-// /*TEST:*/ createBranch(form); /
+// /*TEST:*/ createBranch(branch_name, branch_address, branch_phone, branch_url, first_name, last_name, email, mobile_number, password); /
 
 module.exports.createBranch = createBranch;
 
-function createBranch(form) {
+function createBranch(branch_name, branch_address, branch_phone, branch_url, first_name, last_name, email, mobile_number, password) {
     return new Promise((resolve, reject) => {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
-
                 request.post(url + '/branch')
                     .set('Content-Type', 'application/json')
                     .set('Accept', 'application/json')
-                    .set('Authorization', 'Bearer ' + token) // step 1
-                    .send(form)
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "branch_name": branch_name, // string
+                        "branch_address": branch_address, // string
+                        "branch_phone": branch_phone, // string
+                        "branch_url": branch_url, // string
+                        "first_name": first_name, // string
+                        "last_name": last_name, // string
+                        "email": email, // string
+                        "mobile_number": mobile_number, // string
+                        "password": password // string
+                      })
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Merchant’s Branch account creation succeeded\n')
+                            console.log('Create Branch: Merchant’s Branch account creation succeeded\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Merchant’s Branch account creation failed\n')
+                            console.log('Create Branch: Merchant’s Branch account creation failed\n')
                             resolve(res);
                         }else {
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Create Branch: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish proper connection with database\n')
-                resolve(value)
-            }
         })
     });
 }
@@ -797,9 +629,6 @@ function retrieveIdBranch(branch_id) {
         var promiseCreateToken = createToken();
         promiseCreateToken.then((value) => {
 
-            if (value.statusCode == 200) {
-                console.log('Step 1: Successful\n')
-                var token = value.body.token
 
                 request.get(url + '/branch/' + branch_id)
                     .set('Content-Type', 'application/json')
@@ -807,30 +636,239 @@ function retrieveIdBranch(branch_id) {
                     .set('Authorization', 'Bearer ' + token)
                     .end((err, res) => {
                         if (res.statusCode >= 200 && res.statusCode <= 299) {
-                            console.log('Step 2: Branch account retrieved successfully\n')
+                            console.log('Retrieve ID Branch: Branch account retrieved successfully\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 400) {
-                            console.log('Step 2: Invalid ID supplied\n')
+                            console.log('Retrieve ID Branch: Invalid ID supplied\n')
                             resolve(res);
                         }
                         else if (res.statusCode == 404) {
-                            console.log('Step 2: Branch account not found\n')
+                            console.log('Retrieve ID Branch: Branch account not found\n')
                             resolve(res);
                         }else{
-                            console.log('Step 2: Could not establish proper connection with database\n')
+                            console.log('Retrieve ID Branch: Could not establish proper connection with database\n')
                             resolve(-1)
                         }
                     })
-            }
-            else if (value.statusCode == 401) {
-                console.log('Step 1: Unauthorized\n')
-                resolve(value); 
-            }
-            else {
-                console.log('Step 1: Could not establish connection with database\n')
-                resolve(value)
-            }
+        })
+    });
+}
+
+// Add transaction record
+// Step 1: retrieve token
+// Step 2: insert transaction into database
+
+// 1 - Credit Card Payment
+// 2 - Credit Card Chargeback
+// 3 - Credit Card Refund
+
+// 4 - Wallet Top-Up
+// 5 - Walley Payment
+// 6 - Wallet Refund
+
+module.exports.createTransactionCreditPayment = createTransactionCreditPayment; // positive amount
+module.exports.createTransactionCreditChargeback = createTransactionCreditChargeback; // negative amount
+module.exports.createTransactionCreditRefund = createTransactionCreditRefund; // negative amount
+module.exports.createTransactionWalletTopup = createTransactionWalletTopup; // positive amount
+module.exports.createTransactionWalletPayment = createTransactionWalletPayment; // positive amount
+module.exports.createTransactionWalletRefund = createTransactionWalletRefund; // negative amount
+
+function createTransactionCreditPayment(fk_user_id, fk_merchant_id, fk_branch_id, braintree_transaction_id, transaction_amount) {
+    return new Promise((resolve, reject) => {
+        var promiseCreateToken = createToken();
+        promiseCreateToken.then((value) => {
+
+                request.post(url + '/transaction')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "fk_user_id": fk_user_id, // integer
+                        "fk_merchant_id": fk_merchant_id, // integer
+                        "fk_branch_id": fk_branch_id, // integer
+                        "braintree_transaction_id": braintree_transaction_id, // string
+                        "transaction_amount": transaction_amount, // integer
+                        "transaction_type": 1 // integer
+                      })
+                    .end((err, res) => {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
+                            console.log('Create Transaction: Transaction Response\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Create Transaction: Invalid Transaction body\n')
+                            resolve(res);
+                        }else {
+                            console.log('Create Transaction: Could not establish proper connection with database\n')
+                            resolve(-1)
+                        }
+                    })
+        })
+    });
+}
+
+function createTransactionCreditChargeback(fk_user_id, fk_merchant_id, fk_branch_id, transaction_amount) {
+    return new Promise((resolve, reject) => {
+        var promiseCreateToken = createToken();
+        promiseCreateToken.then((value) => {
+
+                request.post(url + '/transaction')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "fk_user_id": fk_user_id, // integer
+                        "fk_merchant_id": fk_merchant_id, // integer
+                        "fk_branch_id": fk_branch_id, // integer
+                        "transaction_amount": -transaction_amount, // integer
+                        "transaction_type": 2 // integer
+                      })
+                    .end((err, res) => {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
+                            console.log('Create Transaction: Transaction Response\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Create Transaction: Invalid Transaction body\n')
+                            resolve(res);
+                        }else {
+                            console.log('Create Transaction: Could not establish proper connection with database\n')
+                            resolve(-1)
+                        }
+                    })
+        })
+    });
+}
+
+function createTransactionCreditRefund(fk_user_id, fk_merchant_id, fk_branch_id, braintree_transaction_id, transaction_amount) {
+    return new Promise((resolve, reject) => {
+        var promiseCreateToken = createToken();
+        promiseCreateToken.then((value) => {
+
+                request.post(url + '/transaction')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "fk_user_id": fk_user_id, // integer
+                        "fk_merchant_id": fk_merchant_id, // integer
+                        "fk_branch_id": fk_branch_id, // integer
+                        "braintree_transaction_id": braintree_transaction_id, // string
+                        "transaction_amount": -transaction_amount, // integer
+                        "transaction_type": 3 // integer
+                      })
+                    .end((err, res) => {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
+                            console.log('Create Transaction: Transaction Response\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Create Transaction: Invalid Transaction body\n')
+                            resolve(res);
+                        }else {
+                            console.log('Create Transaction: Could not establish proper connection with database\n')
+                            resolve(-1)
+                        }
+                    })
+        })
+    });
+}
+
+function createTransactionWalletTopup(fk_user_id, braintree_transaction_id, transaction_amount) {
+    return new Promise((resolve, reject) => {
+        var promiseCreateToken = createToken();
+        promiseCreateToken.then((value) => {
+
+                request.post(url + '/transaction')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "fk_user_id": fk_user_id, // integer
+                        "braintree_transaction_id": braintree_transaction_id, // string
+                        "transaction_amount": transaction_amount, // integer
+                        "transaction_type": 4 // integer
+                      })
+                    .end((err, res) => {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
+                            console.log('Create Transaction: Transaction Response\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Create Transaction: Invalid Transaction body\n')
+                            resolve(res);
+                        }else {
+                            console.log('Create Transaction: Could not establish proper connection with database\n')
+                            resolve(-1)
+                        }
+                    })
+        })
+    });
+}
+
+function createTransactionWalletPayment(fk_user_id, fk_merchant_id, fk_branch_id, transaction_amount) {
+    return new Promise((resolve, reject) => {
+        var promiseCreateToken = createToken();
+        promiseCreateToken.then((value) => {
+
+                request.post(url + '/transaction')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "fk_user_id": fk_user_id, // integer
+                        "fk_merchant_id": fk_merchant_id, // integer
+                        "fk_branch_id": fk_branch_id, // integer
+                        "transaction_amount": transaction_amount, // integer
+                        "transaction_type": 5// integer
+                      })
+                    .end((err, res) => {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
+                            console.log('Create Transaction: Transaction Response\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Create Transaction: Invalid Transaction body\n')
+                            resolve(res);
+                        }else {
+                            console.log('Create Transaction: Could not establish proper connection with database\n')
+                            resolve(-1)
+                        }
+                    })
+        })
+    });
+}
+
+function createTransactionWalletRefund(fk_user_id, fk_merchant_id, fk_branch_id, transaction_amount) {
+    return new Promise((resolve, reject) => {
+        var promiseCreateToken = createToken();
+        promiseCreateToken.then((value) => {
+
+                request.post(url + '/transaction')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + value) 
+                    .send({
+                        "fk_user_id": fk_user_id, // integer
+                        "fk_merchant_id": fk_merchant_id, // integer
+                        "fk_branch_id": fk_branch_id, // integer
+                        "transaction_amount": -transaction_amount, // integer
+                        "transaction_type": 6 // integer
+                      })
+                    .end((err, res) => {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
+                            console.log('Create Transaction: Transaction Response\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Create Transaction: Invalid Transaction body\n')
+                            resolve(res);
+                        }else {
+                            console.log('Create Transaction: Could not establish proper connection with database\n')
+                            resolve(-1)
+                        }
+                    })
         })
     });
 }
@@ -841,140 +879,55 @@ function retrieveIdBranch(branch_id) {
 /* |||  |||||| |||     |||     |||      |||    |||      ||| |||       */
 /* |||    |||| \|||||||||/     |||      \||||||||/ |||||||/ ||||||||| */
 
-//works but not in use // in case kenneth want primary key out of create token
-
-// var promiseCreateToken = createToken(primary_key);
-
-// promiseCreateToken.then((value)=>{
-//     // console.log(value.statusCode)
-//     if (value.statusCode == 200){
-//     var promiseRetrieveTransactions = retrieveTransactions(value.body.token);
-//     promiseRetrieveTransactions.then((value1)=>{
-//         res.send(value);
-//     })
-
-//     }
-//     else if (value.statusCode == 401){
-//         res.send("Unauthorized");
-//     }
-//     else {
-//         console.log(err)
-//         res.send(err)
-//     }
-
-// })
-
-// var primaryKey = "NnGUnatosykldCDs6m5Ma4tBGlb6Wyue912JLQ=="
-
-// createToken(primaryKey);
-
-// function createToken(primary_key) {
-//     return new Promise((resolve, reject) => {
-
-//         request.post(url + '/account/token')
-//             .set('Content-Type', 'application/json')
-//             .send({ "primary_key": primary_key })
-//             .end((err, res) => {
-//                 if (res.statusCode == 200) {
-//                     console.log('Successful\n')
-//                     resolve(res);
-//                 }
-//                 else if (res.statusCode == 401) {
-//                     console.log('Unauthorized\n')
-//                     resolve(res);
-//                 }
-//             })
-//     });
-// }
-
-//retrieve all transactions
-
-// module.exports.retrieveTransactions = retrieveTransactions;
-
-// function retrieveTransactions(token) {
-//     return new Promise((resolve, reject) => {
-//       request.get(url + '/transaction')
-//         .set('Content-Type', 'application/json')
-//         .set('Accept', 'application/json')
-//         .set('Authorization', 'Bearer ' + token)
-//         .end((err, res) => {
-//             if(res.statusCode == 200){
-//                 console.log('Transaction details retrieved successfully\n')
-//                 resolve(res.body);
-//             }
-//             else if(res.statusCode = 400){
-//                 console.log('Invalid\n')
-//                 resolve(res.statusCode);
-//             }
-//             else if(res.statusCode == 404){
-//                 console.log('Transaction not found\n')
-//                 resolve(res.statusCode);
-//             }
-//         })
-//       });
-//     }
-
 /////////////////////////////////////////////////////////////////////////////////////
 
-// Update a settlement record // ? why need this
-/*
-var form = {
-    "fk_merchant_id": 0,
-    "fk_branch_id": 0,
-    "fk_transaction_id": 0,
-    "settlement_amount": 0
-  }
-  */
+// Update a settlement record 
 
-  /*TEST:*/ 
+    // "fk_merchant_id": 0,
+    // "fk_branch_id": 0,
+    // "fk_transaction_id": 0,
+    // "settlement_amount": 0
+
+//   /*TEST:*/ updateIdSettlement(settlement_id, fk_merchant_id, fk_branch_id, fk_transaction_id, settlement_amount);
 
 // module.exports.updateIdSettlement = updateIdSettlement;
 
-// function updateIdSettlement(settlement_id, form) {
-//     return new Promise((resolve, reject) => {
-//         var promiseCreateToken = createToken();
-//         promiseCreateToken.then((value) => {
-//             if (value.statusCode == 200) {
-//                 var token = value.body.token
-//                 request.put(url + '/settlement/' + settlement_id)
-//                     .set('Content-Type', 'application/json')
-//                     .set('Accept', 'application/json')
-//                     .set('Authorization', 'Bearer ' + token)
-//                     .send(form)
-//                     .end((err, res) => {
-//                         if (res.statusCode == 200) {
-//                             console.log('Updated settlement\n')
-//                             resolve(res);
-//                         }
-//                         else if (res.statusCode == 400) {
-//                             console.log('Invalid Settlement body\n')
-//                             resolve(res);
-//                         }else{
-//                             console.log('Step 2: Could not establish proper connection with database\n')
-//                             resolve(-1)
-//                         }
-//                     })
-//             }
-//             else if (value.statusCode == 401) {
-//                 console.log('Step 1: Unauthorized\n')
-//                 resolve(value.message); 
-//             }
-//             else {
-//                 console.log('Step 1: Could not establish connection with database\n')
-//                 resolve(value)
-//             }
-//         })
-//     });
-// }
+function updateIdSettlement(settlement_id, fk_merchant_id, fk_branch_id, fk_transaction_id, settlement_amount) {
+    return new Promise((resolve, reject) => {
+        var promiseCreateToken = createToken();
+        promiseCreateToken.then((value) => {
+                request.put(url + '/settlement/' + settlement_id)
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + value)
+                    .send({
+                        "fk_merchant_id": 0, // integer
+                        "fk_branch_id": 0, // integer
+                        "fk_transaction_id": 0, // integer
+                        "settlement_amount": 0 // integer
+                      })
+                    .end((err, res) => {
+                        if (res.statusCode >= 200 && res.statusCode <= 299) {
+                            console.log('Update ID Settlement: Updated settlement\n')
+                            resolve(res);
+                        }
+                        else if (res.statusCode == 400) {
+                            console.log('Update ID Settlement: Invalid Settlement body\n')
+                            resolve(res);
+                        }else{
+                            console.log('Update ID Settlement: Could not establish proper connection with database\n')
+                            resolve(-1)
+                        }
+                    })
+        })
+    });
+}
 
 ///////////////////////////////////////////////////////////////////////////////////
 
 // Update settlement to completed status
-/*
-var form = {
-    "settlement_id": 0
-}
-*/
+
+    // "settlement_id": 0
 
 /*TEST:*/ 
 
@@ -984,17 +937,14 @@ var form = {
 //     return new Promise((resolve, reject) => {
 //         var promiseCreateToken = createToken();
 //         promiseCreateToken.then((value) => {
-//             if (value.statusCode == 200) {
-//                 console.log('Step 1: Successful\n')
-//                 var token = value.body.token
 
 //                 request.put(url + '/settlement/completed')
 //                     .set('Content-Type', 'application/json')
 //                     .set('Accept', 'application/json')
-//                     .set('Authorization', 'Bearer ' + token)
-//                     .send({ "settlement_id": settlement_id }) // "settlement_id" : `${settlement_id}`
+//                     .set('Authorization', 'Bearer ' + value)
+//                     .send({ "settlement_id": settlement_id }) // integer
 //                     .end((err, res) => {
-//                         if (res.statusCode == 200) {
+//                         if (res.statusCode >= 200 && res.statusCode <= 299) {
 //                             console.log('Updated settlement\n')
 //                             resolve(res);
 //                         }
@@ -1003,14 +953,6 @@ var form = {
 //                             resolve(res);
 //                         }
 //                     })
-//             }
-//             else if (value.statusCode == 401) {
-//                 resolve("Unauthorized"); // or value.body.message
-//             }
-//             else {
-//                 console.log("error with token\n")
-//                 resolve(value)
-//             }
 //         })
 //     });
 // }

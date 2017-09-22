@@ -16,9 +16,9 @@ var promiseRetrieveSettlement = phase2.retrieveTransactionIdSettlement()
 
 //             if (value != null) {
 //                 // json = {
-//                 //     [{"settlement_id" : settlement_id,"fk_merchant_id","fk_branch_id","fk_transaction_id","transaction_complete","settlement_amount", "create_at" : create_at, "modified_at" : modified_at}],
-//                 //     [{"settlement_id" : settlement_id,"fk_merchant_id","fk_branch_id","fk_transaction_id","transaction_complete","settlement_amount", "create_at" : create_at, "modified_at" : modified_at}],
-//                 //     [{"settlement_id" : settlement_id,"fk_merchant_id","fk_branch_id","fk_transaction_id","transaction_complete","settlement_amount", "create_at" : create_at, "modified_at" : modified_at}]
+//                 //     [{"settlement_id" : settlement_id,"fk_merchant_id","fk_branch_id","fk_transaction_id","transaction_complete","settlement_amount", "created_at" : created_at, "modified_at" : modified_at}],
+//                 //     [{"settlement_id" : settlement_id,"fk_merchant_id","fk_branch_id","fk_transaction_id","transaction_complete","settlement_amount", "created_at" : created_at, "modified_at" : modified_at}],
+//                 //     [{"settlement_id" : settlement_id,"fk_merchant_id","fk_branch_id","fk_transaction_id","transaction_complete","settlement_amount", "created_at" : created_at, "modified_at" : modified_at}]
 //                 // }
 //                 var stop;
 //                 for (var i = 0, j = value.length; i < j; i++) {
@@ -35,9 +35,9 @@ var promiseRetrieveSettlement = phase2.retrieveTransactionIdSettlement()
 //                     console.log(value[stop].fk_transaction_id)
 //                     console.log(value[stop].transaction_complete)
 //                     console.log(value[stop].settlement_amount)
-//                     console.log(value[stop].create_at)
+//                     console.log(value[stop].created_at)
 //                     console.log(value[stop].modified_at)
-//                     transaction.push(value[stop].settlement_id, value[stop].fk_merchant_id, value[stop].fk_branch_id, value[stop].fk_transaction_id, value[stop].transaction_complete, value[stop].settlement_amount, value[stop].create_at, value[stop].modified_at)// modified at might be null
+//                     transaction.push(value[stop].settlement_id, value[stop].fk_merchant_id, value[stop].fk_branch_id, value[stop].fk_transaction_id, value[stop].transaction_complete, value[stop].settlement_amount, value[stop].created_at, value[stop].modified_at)// modified at might be null
 //                     resolve(transaction); // "settlement records are retrieved"
 
 //                 }

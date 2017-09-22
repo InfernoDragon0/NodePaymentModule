@@ -38,8 +38,10 @@ function btRefund(btTransactionId) {
 
 // refund partial amount with bt **
 
+module.exports.btPartialRefund = btPartialRefund;
+
 function btPartialRefund(btTransactionId, refundAmt) {
-    // return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         cvars.gateway.transaction.refund(btTransactionId, refundAmt, function (err, result) {
             if (err) {
                 // console.log(err)
@@ -49,5 +51,5 @@ function btPartialRefund(btTransactionId, refundAmt) {
                 resolve(result);
             }
         });
-    // }) // close promise
+    }) // close promise
 };
